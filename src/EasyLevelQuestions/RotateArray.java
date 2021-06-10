@@ -14,6 +14,8 @@ public class RotateArray {
     }
 
     /**
+     Using Reverse
+
      [5. 9] k = 3
      => [9 5]
 
@@ -29,6 +31,7 @@ public class RotateArray {
      3 - Reverse the last k values
      */
 
+    // Runtime - O(n), Space - O(1)
     public static void rotateArray(int[] nums, int k) {
         k = k % nums.length;
         if(k == 0) return;
@@ -47,6 +50,25 @@ public class RotateArray {
 
             startIndex++;
             endIndex--;
+        }
+    }
+
+    /**
+     Using Extra Array
+
+     Idea is to place each element in their correct
+     position in the new array
+     */
+
+    // Runtime - O(n), Space - O(n)
+    public static void rotateArray2(int[] nums, int k){
+        int[] newArray = new int[nums.length];
+        for(int i = 0; i < nums.length; i++){
+            newArray[(i+k) % nums.length] = nums[i];
+        }
+
+        for(int j = 0; j < newArray.length; j++){
+            nums[j] = newArray[j];
         }
     }
 }
