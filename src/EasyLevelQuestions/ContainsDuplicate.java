@@ -2,7 +2,7 @@ package EasyLevelQuestions;
 
 import java.util.*;
 
-// NB: LC Question - 17
+// NB: LC Question - 217
 public class ContainsDuplicate {
     public static void main(String[] args){
         int[] input1 = {1,2,3,1};
