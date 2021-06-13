@@ -1,4 +1,1 @@
-package EasyLevelQuestions;
-
-public class MoveZeros {
-}
+package EasyLevelQuestions;import java.util.Arrays;// LC Question 283public class MoveZeros {    public static void main(String[] args){        int[] input = {0,1,0,3,12};        moveZeroes(input);        System.out.println(Arrays.toString(input));    }    public static void moveZeroes(int[] nums) {        int i = 0, j = 0;        while(j < nums.length){            if(nums[j] != 0){                int temp = nums[i];                nums[i] = nums[j];                nums[j] = temp;                i++;            }            j++;        }    }}
