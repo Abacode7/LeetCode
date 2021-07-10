@@ -7,10 +7,11 @@ public class LC104_MaximumDepthOfABinaryTree {
     }
 
     // First solution
-    // Runtime O(n), we go over each not exactly once
-    // Space O(n), at worst case we have a skewed binary tree,
-    // this makes us store left, right values for all nodes
-    // at each depth in the internal stack
+    // Runtime O(N), we go over each not exactly once
+    // Space O(N), at worst case we have a skewed binary tree,
+    // there the storage to keep the call stack would be O(N)
+    // at best case the tree is balanced hence the height of the
+    // tree is O(logN)...same with call stack
     public static int maxDepth(TreeNode root) {
         // We use depth first search
         // For each node we assign it a depth
@@ -33,5 +34,16 @@ public class LC104_MaximumDepthOfABinaryTree {
             rightTree = dfs(root.right, depth+1);
 
         return Math.max(leftTree, rightTree);
+    }
+
+    // Other solution
+    public static int maxDepthImp(TreeNode root) {
+        if (root == null) {
+            return 0;
+        } else {
+            int left_height = maxDepthImp(root.left);
+            int right_height = maxDepthImp(root.right);
+            return java.lang.Math.max(left_height, right_height) + 1;
+        }
     }
 }
