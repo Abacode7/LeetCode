@@ -27,11 +27,13 @@ class Solution {
     /** Returns a random shuffling of the array. */
     /*
     Using Knuth Shuffle algorithm
+    NB: There are many ways to express this algorithm
+    Check out this variation
+
     for(int i=result.length-1; i>0; i--){
         int randInt = random.nextInt(i);
         swap(result, i, randInt);
      }
-     NB: There are many ways to express this algorithm
      */
     // Runtime O(N), Space O(N)
     public int[] shuffle() {
