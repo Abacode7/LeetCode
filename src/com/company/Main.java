@@ -15,6 +15,7 @@ public class Main {
         System.out.println(merge(intervals));
     }
 
+
     public static int findCircleNum(int[][] isConnected) {
         Set<Integer> isFound = new HashSet<>();
         int provinceCount = 0;
@@ -65,4 +66,33 @@ public class Main {
         }
         return result.toArray(new int[result.size()][2]);
     }
+
+    /**
+     * Utility methods
+     * @param array
+     */
+
+    public static <T> void printArray(T[] array){
+        for (T v: array) {
+            System.out.println(v);
+        }
+    }
+
+    public static void printArray(int[] array){
+        for (int v: array) {
+            System.out.println(v);
+        }
+    }
+
+    public static void printArray(double[] array){
+        for (double v: array) {
+            System.out.println(v);
+        }
+    }
+
+    // 270 Closest value in BST
+    // 112 Path sum
+    // 104 Maximum depth of Binary tree
+    // 111 Minimum depth of BT
+    // 1701 average waiting time
 }
