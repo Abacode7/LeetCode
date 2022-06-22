@@ -2,7 +2,7 @@ package com.company;
 
 import java.util.*;
 
-public class L0001_TwoSum {
+public class LC0001_TwoSum {
     public static void main(String[] args){
         int[] nums = {2,7,11,15};
         int target = 9;
