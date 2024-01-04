@@ -90,9 +90,42 @@ public class Main {
         }
     }
 
+    public static <T> void printArray(List<T> array){
+        for (T t: array) {
+            System.out.println(t);
+        }
+    }
+
+    /** Quick Notes **/
+
     // 270 Closest value in BST
     // 112 Path sum
     // 104 Maximum depth of Binary tree
     // 111 Minimum depth of BT
     // 1701 average waiting time
+
+    /**
+     *
+     * Questions from live coding interviews
+     *
+     * Amazon final stage:
+     * - Question on chess game with focus on
+     * the movement of the knight piece.
+     *
+     * - Multi String Search
+     *
+     * Google final stage:
+     * - Question on Google document, to count lines words will fit in.
+     * - Follow up on how you can adjust the table divider to fit words on
+     * the min number of lines.
+     *
+     * - Multi String Search:
+     *  Question on list of words and a dictionary to find something... (can't fully recall)
+     *
+     * - Given a list of integer, find max length of adjacent similar elements.
+     * - Follow up, if you're allowed to switch 3 element values, what is the max length still.
+     *
+     * - Given people (with choice of rooms) and rooms (single or multipartner rooms)
+     *
+     */
 }
