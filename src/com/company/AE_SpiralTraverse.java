@@ -14,6 +14,81 @@ public class AE_SpiralTraverse {
         List<Integer> result = spiralTraverse(input);
         Main.printArray(result);
     }
+
+    // Todo: Rework to cover all test cases (8/12)
+    /**
+
+     1  2  3  4 0
+     10 11 12 5 0
+     9   8  7 6 0
+     2   45 0 8 3
+
+     increase j = startJ - endJ
+     increase i = startI+1 - endI
+     decrease j = endJ-1 - startJ
+     decrease i = endI-1 - start-1
+
+     // stopping condition, if any index is repeated - stop and return
+
+     [[1 2 3 4 5]
+
+     ]
+
+     **/
+    public static List<Integer> spiralTraverse(int[][] array) {
+        List<Integer> result = new ArrayList<>();
+        Set<String> set = new HashSet<>();
+
+        int startI = 0, endI = array.length-1, startJ = 0, endJ = array[0].length-1;
+        while(allInBound(array, startI, endI, startJ, endJ) && !set.contains(startI + "" + startJ)){
+            spiral(array, result, set, startI, endI, startJ, endJ);
+            startI++;
+            startJ++;
+            endI--;
+            endJ--;
+        }
+        // Write your code here.
+        return result;
+    }
+
+    public static boolean allInBound(int[][] array, int startI, int endI, int startJ, int endJ){
+        if(startI < 0 || startI >= array.length) return false;
+
+        if(endI < 0 || endI >= array.length) return false;
+
+        if(startJ < 0 || startJ >= array.length) return false;
+
+        if(endJ < 0 || endJ >= array.length) return false;
+
+        return true;
+    }
+
+    public static void spiral(int[][] array, List<Integer> result, Set<String> set, int startI, int endI, int startJ, int endJ){
+        for(int i=startI, j=startJ; j<=endJ; j++){
+            if(set.contains(i + "" + j)) return;
+            result.add(array[i][j]);
+            set.add(i + "" + j);
+        }
+
+        for(int j=endJ, i=startI+1; i<=endI; i++){
+            if(set.contains(i + "" + j)) return;
+            result.add(array[i][j]);
+            set.add(i + "" + j);
+        }
+
+        for(int i=endI, j=endJ-1; j>=startJ; j--){
+            if(set.contains(i + "" + j)) return;
+            result.add(array[i][j]);
+            set.add(i + "" + j);
+        }
+
+        for(int j=startJ, i=endI-1; i>=startI-1; i--){
+            if(set.contains(i + "" + j)) return;
+            result.add(array[i][j]);
+            set.add(i + "" + j);
+        }
+    }
+
     /**
      1 2 3 4 5
      10  9  8  7  6
@@ -33,7 +108,7 @@ public class AE_SpiralTraverse {
      **/
 
     // Todo: Timeout
-    public static List<Integer> spiralTraverse(int[][] array) {
+    public static List<Integer> spiralTraverse1(int[][] array) {
         if(array == null || array.length == 0) return new ArrayList<>();
 
         List<Integer> result = new ArrayList<>();
