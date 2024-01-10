@@ -1,6 +1,6 @@
 package com.company;
 
-public class _isSubString {
+public class Amazon_OS_IsSubString {
     /**
      * given
      * big: tpabcfhjkabcdzy
