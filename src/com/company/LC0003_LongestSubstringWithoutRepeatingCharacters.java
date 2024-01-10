@@ -31,4 +31,35 @@ public class LC0003_LongestSubstringWithoutRepeatingCharacters {
 
         return maxSubstringLen;
     }
+
+    /**
+     Solution 2
+     Runtime: O(N^2), for each element we iterate through it's consecutive elements
+     Space: O(N), for the character array created
+     Tag: Arrays
+     */
+    public static int lengthOfLongestSubstring2(String s) {
+        char[] sChars = s.toCharArray();
+        int sLength = sChars.length;
+
+        int result = 0;
+        int i = 0;
+        while(i < sLength){
+            Set<Character> set = new HashSet<>();
+            set.add(sChars[i]);
+            int j = i + 1;
+            int count = 1;
+
+            while(j < sLength && !set.contains(sChars[j])){
+                count++;
+                set.add(sChars[j]);
+                j++;
+            }
+
+            result = Math.max(result, count);
+            i++;
+        }
+
+        return result;
+    }
 }
