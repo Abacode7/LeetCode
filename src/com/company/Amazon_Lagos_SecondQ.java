@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Amazon_Lagos_SecondQ {
     public static void main(String[] args){
-
     }
 
     public static List<List<Integer>> getMaxDistance(int maxDistance, List<List<Integer>> forward,
