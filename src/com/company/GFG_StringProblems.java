@@ -357,8 +357,8 @@ public class GFG_StringProblems {
      *  Store used variables in a set for each
      * Count the longest substring and compare with the global max longest substring
      *
-     * Solution 2: Sliding Window, O(n) time, O(n) space which could be O(1) if we use
-     * boolean[] visited = new boolean[26];
+     * Solution 2: Sliding Window, O(n) time, O(1) space since it grows wrt to n until
+     * the 26th alphabet
      *
      * left | right
      * right is exploratory:
