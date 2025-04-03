@@ -4,7 +4,7 @@ import java.util.*;
 
 public class GFG_StringProblems {
     public static void main(String[] args){
-        System.out.println(multiplyStrings("00055", "0"));
+        System.out.println(longestUniqueSubstring2("abcbadbd"));
     }
 
     /**
@@ -349,15 +349,26 @@ public class GFG_StringProblems {
 
     /**
      * Live Breakdown
-     * geeksforgeeks
+     * abcbadbd
      * i, j = i + 1
      *
      * Solution 1: Brute force, O(n^2) time, O(n^2) space
      * Iterate through every index, find the longest substring at each index
      *  Store used variables in a set for each
      * Count the longest substring and compare with the global max longest substring
-     * */
-    int longestUniqueSubstring(String s) {
+     *
+     * Solution 2: Sliding Window, O(n) time, O(n) space which could be O(1) if we use
+     * boolean[] visited = new boolean[26];
+     *
+     * left | right
+     * right is exploratory:
+     * Iterate right, finding unique elements, calculating the longest substring
+     * When right encounters a duplicate:
+     *  increment left till the prior duplicate
+     *  remove character occurrences while iterating the left
+     *  increment both left and right
+`     * */
+    static int longestUniqueSubstring(String s) {
         // code here
         int longestSubstring = 0;
 
@@ -378,5 +389,27 @@ public class GFG_StringProblems {
             i++;
         }
         return longestSubstring;
+    }
+
+    static int longestUniqueSubstring2(String s) {
+        // code here - OPTIMAL
+        int left = 0, right = 0;
+        int maxSubstring = 0;
+        Set<Character> set = new HashSet<>();
+
+        while(right < s.length()){
+            if(!set.contains(s.charAt(right))){
+                maxSubstring = Math.max((right - left + 1), maxSubstring);
+                set.add(s.charAt(right));
+            }else{
+                while(s.charAt(left) != s.charAt(right)){
+                    set.remove(s.charAt(left));
+                    left++;
+                }
+                left++;
+            }
+            right++;
+        }
+        return maxSubstring;
     }
 }
