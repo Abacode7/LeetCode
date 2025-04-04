@@ -5,6 +5,7 @@ import java.util.*;
 public class GFG_StackProblems {
 
     public static void main(String[] args){
+        // Test sort stack
         Stack<Integer> stack = new Stack<>();
         stack.add(5);
         stack.add(4);
@@ -25,12 +26,28 @@ public class GFG_StackProblems {
         }
 
         /**
+         * Test next large element
          * 41 88 58 69 93 42 44 25 12 47 41 88 58 69 93 42 44 25 12 47 - Input
          * 88 93 69 93 93 44 47 47 47 88 88 93 69 93 -1 44 47 47 47 -1 - Mine
          * 88 93 69 93 -1 44 47 47 47 88 88 93 69 93 -1 44 47 47 47 -1 - Correct
          */
         System.out.println(nextLargerElement(new int[]{6, 8, 0, 1, 3})); //[8, -1, 1, 3, -1]
+
+        // Test valid parenthesis
         System.out.println(validParenthesis("[()()]{}"));
+
+        // Test stack queue
+        pushQueue(1);
+        pushQueue(3);
+        pushQueue(5);
+        pushQueue(7);
+        pushQueue(9);
+        while(true){
+            int value = popQueue();
+            if(value == -1) break;
+            System.out.println(value);
+        }
+        System.out.println();
     }
 
 
@@ -254,6 +271,13 @@ public class GFG_StackProblems {
 
 
     /**
+     * Live Breakdown
+     * 1 3 5 7 9
+     * Stack 1          Stack 2
+     * [1 3 5 7 9] <-> [1 3 5 7 9]
+     *    1 3 5 7 9 <=
+     *
+     *
      * Implement queue using stacks
      * Idea is simple
      * For Enqueue: Push into stack 1
@@ -262,20 +286,22 @@ public class GFG_StackProblems {
      * - If stack 2 is not empty, simply pop from stack 2
      * (the order will have reversed from LIFO to FIFO)
      *
+     * LIFO + LIFO => FIFO
      * Solution:
      * Enqueue: O(1) time, O(n) space
      * Dequeue: O(n) time, O(n) space
      */
-    Stack<Integer> stack1 = new Stack<>();
-    Stack<Integer> stack2 = new Stack<>();
-    public void pushQueue(int data){
+    static Stack<Integer> stack1 = new Stack<>();
+    static Stack<Integer> stack2 = new Stack<>();
+    public static void pushQueue(int data){
         stack1.push(data);
     }
 
-    public int popQueue(){
+    public static int popQueue(){
         if(stack1.isEmpty() && stack2.isEmpty()) return -1;
 
-        if(!stack2.isEmpty()){
+        // If there are no elements in stack 2, add to it
+        if(stack2.isEmpty()){
             while(!stack1.isEmpty()){
                 stack2.push(stack1.pop());
             }
