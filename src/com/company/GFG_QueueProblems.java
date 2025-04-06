@@ -356,4 +356,42 @@ public class GFG_QueueProblems {
         // Return min time to corrupt all oranges
         return Math.max(0, minTime - 1);
     }
+
+
+    /**
+     * Live Breakdown
+     * 4 3 1 10 2 6
+     *
+     * [4 3 1 10 2 6  queue
+     * 6 2 10 1 3 4]  stack
+     *
+     * Solution: Using Stack, O(n) time, O(n) extra space - OPTIMAL
+     * */
+    public Queue<Integer> reverseQueue(Queue<Integer> queue) {
+        // code here. - OPTIMAL
+        Stack<Integer> stack = new Stack<>();
+        while(!queue.isEmpty()){
+            stack.push(queue.poll());
+        }
+
+        while(!stack.isEmpty()){
+            queue.offer(stack.pop());
+        }
+        return queue;
+    }
+
+    public Queue<Integer> reverseQueue2(Queue<Integer> queue) {
+        // code here. - OPTIMAL
+        List<Integer> list = new ArrayList<>(queue);
+        int i=0, j = list.size() - 1;
+        while(i <= j){
+            int temp = list.get(j);
+            list.set(j, list.get(i));
+            list.set(i, temp);
+
+            i++;
+            j--;
+        }
+        return new LinkedList<>(list);
+    }
 }
