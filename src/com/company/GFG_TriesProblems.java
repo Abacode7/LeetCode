@@ -1,6 +1,6 @@
 package com.company;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Stream;
 
 @SuppressWarnings("ALL")
@@ -40,6 +40,16 @@ public class GFG_TriesProblems {
         for(String word: dictionary){
             System.out.printf("This word: %s is present in trie: %s\n", word, search(trieNode, word));
         }
+        System.out.println();
+
+        // Longest Common Prefix
+        System.out.println(longestCommonPrefix2(new String[]{ "ambivert", "ambission", "amber", "ambivalent", "ambassy"}));
+        System.out.println();
+
+        // Unique Rows
+        int[][] a = {{1, 1, 0, 1},{1, 0, 0, 1},{1, 1, 0, 1}};
+        System.out.println(uniqueRow2(a, 3, 4));
+        System.out.println();
     }
 
     public static class TrieNode {
@@ -52,6 +62,23 @@ public class GFG_TriesProblems {
         }
     }
 
+    /**
+     * Intuition
+     * TrieNode with properties TrieNode[26] children and int wordCount.
+     * Where each children index with TrieNode represents the presence of the charater at such index, it the Trie.
+     * wordCount marks the end of the last character in the string. We use wordCount int, rather than isEndOfWord boolean
+     * because wordCount allows us count the number of times a particular word occurred and in the case of deletion, we still
+     * retain correct number of such word remaining.
+     *
+     * Trie Complexity
+     * Insertion: O(n) time, where n is length of word. O(1) space
+     * Search: O(n) time, O(1) space
+     * Search Prefix: O(n) time, O(1) space
+     * Deletion: O(n) time (inner count operations are constant time). O(1) space.
+     *
+     * Trie Building for list of words
+     * Insertion: O(mn) where m is length of longest word, and n is the number of words. O(1) space
+     */
     public static void insert(TrieNode root, String data){
         TrieNode current = root;
 
@@ -176,5 +203,202 @@ public class GFG_TriesProblems {
         // Set the last multi-children node (with last character) to null
         lastCurrentNode.childNodes[lastCurrentChar - 'a'] = null;
         return true;
+    }
+
+
+
+    /**
+     * Given string array: [ "ambivert", "ambission", "amber", "ambivalent", "ambassy"]
+     * Find the longest common prefix: "amb"
+     *
+     * Solution 1: Sorting, O(nlogn) time, O(k) where k is the length of the longest common prefix
+     * O(1) amortized time (i.e not considering the output length)
+     * Intuition: If you sort the words in the list, two farthest words (first & last)
+     * will defer the most.
+     * Find the longest common prefix amidst them, that tells all the tales
+     *
+     * Solution 2: Tries
+     * O(mn) time, where m is lenght of longest string in array, and n is length of array
+     * O(n) amortized time, where we exclude the time taken to build the Trie data structure
+     *
+     * O(mn) space, worst case where each word in array is not overlapping so every character
+     * in every word takes a node.
+     */
+    public static String longestCommonPrefix1(String arr[]) {
+        // code here
+        if(arr.length <= 0) return "";
+        if(arr.length == 1) return arr[0];
+
+        Arrays.sort(arr);
+        int n = arr.length;
+
+        StringBuilder sb = new StringBuilder();
+        int minLength = Math.min(arr[0].length(), arr[n-1].length());
+
+        for(int i=0; i<minLength; i++){
+            if(arr[0].charAt(i) != arr[n-1].charAt(i)) break;
+            sb.append(arr[0].charAt(i));
+        }
+
+        if(sb.length() == 0) return "";
+        return sb.toString();
+    }
+
+    public static String longestCommonPrefix2(String arr[]){
+        if(arr.length == 0) return "";
+        if(arr.length == 1) return arr[0];
+
+        LCPTrieNode root = new LCPTrieNode();
+        for(String word: arr){
+            insertIntoTrie(root, word);
+        }
+        return searchLongCommonPrefix(root, arr[0]);
+    }
+
+    static class LCPTrieNode {
+        LCPTrieNode[] children;
+        int childrenCount;
+        int wordCount;
+
+        public LCPTrieNode(){
+            this.children = new LCPTrieNode[26];
+            childrenCount = 0;
+            wordCount = 0;
+        }
+    }
+
+    private static void insertIntoTrie(LCPTrieNode root, String data){
+        LCPTrieNode current = root;
+        for(char c: data.toCharArray()){
+            if(current.children[c - 'a'] == null){
+                current.children[c - 'a'] = new LCPTrieNode();
+                current.childrenCount++;
+            }
+            current =  current.children[c - 'a'];
+        }
+        current.wordCount++;
+    }
+
+    private static String searchLongCommonPrefix(LCPTrieNode root, String data){
+        StringBuilder sb = new StringBuilder();
+
+        LCPTrieNode current = root;
+        for(char c: data.toCharArray()){
+            if(current.childrenCount != 1) break;
+
+            if(current.children[c - 'a'] == null){
+                break;
+            }
+
+            sb.append(c);
+            current = current.children[c - 'a'];
+        }
+        return sb.toString();
+    }
+
+
+
+
+    /**
+     * Given:  {{1 1 0 1}, {1 0 0 1}, {1 1 0 1}}
+     * Result: {{1 1 0 1}, {1 0 0 1}}
+     *
+     * Trie:
+     *     root
+     *      1
+     *   1.   0
+     *  0.     0
+     * 1.       1
+     *
+     * Solution 1: Using Sets, O(r*c) time, O(m*n) space
+     *
+     * Solution 2: Using DFS on Tries
+     * Result: Solution too long
+     * */
+    public static ArrayList<ArrayList<Integer>> uniqueRow1(int a[][],int r, int c) {
+        //add code here.
+        Set<String> set = new HashSet<>();
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+
+        for(int i=0; i < r; i++){
+
+            StringBuilder sb = new StringBuilder();
+            ArrayList<Integer> row = new ArrayList<>();
+            for(int j=0; j < c; j++){
+                sb.append(a[i][j]);
+                row.add(a[i][j]);
+            }
+
+            if(!set.contains(sb.toString())){
+                result.add(row);
+            }
+            set.add(sb.toString());
+        }
+
+        return result;
+    }
+
+    public static ArrayList<ArrayList<Integer>> uniqueRow2(int a[][],int r, int c){
+        //add code here.
+        URTrieNode root = new URTrieNode(-1);
+        for(int[] matrix: a){
+            insertIntoURTrie(root, matrix);
+        }
+
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        for(URTrieNode node: root.children){
+            if(node != null){
+                ArrayList<ArrayList<Integer>> dfsResult = dfsTrie(node, new ArrayList<Integer>());
+                result.addAll(dfsResult);
+            }
+        }
+        return result;
+    }
+
+    private static ArrayList<ArrayList<Integer>> dfsTrie(URTrieNode node, ArrayList<Integer> list){
+        list.add(node.value);
+
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+
+        if(node.wordCount > 0) result.add(list);
+
+        for(URTrieNode subNode: node.children){
+            if(subNode != null){
+                ArrayList<ArrayList<Integer>> dfsResult = dfsTrie(subNode, new ArrayList<Integer>(list));
+                result.addAll(dfsResult);
+            }
+        }
+        return result;
+    }
+
+    private static class URTrieNode {
+        List<URTrieNode> children;
+        int value;
+        int wordCount;
+
+        public URTrieNode(int value){
+            this.value = value;
+            children = new ArrayList<>();
+            wordCount = 0;
+        }
+    }
+
+    private static void insertIntoURTrie(URTrieNode root, int[] matrix){
+        URTrieNode current = root;
+
+        for(int value: matrix){
+            if(subNode(current, value) == null){
+                current.children.add(new URTrieNode(value));
+            }
+            current = subNode(current, value);
+        }
+        current.wordCount++;
+    }
+
+    private static URTrieNode subNode(URTrieNode node, int value){
+        for(URTrieNode element: node.children){
+            if(element.value == value) return element;
+        }
+        return null;
     }
 }
