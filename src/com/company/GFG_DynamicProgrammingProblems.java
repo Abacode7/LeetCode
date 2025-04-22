@@ -1,10 +1,8 @@
 package com.company;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@SuppressWarnings("DuplicatedCode")
 public class GFG_DynamicProgrammingProblems {
     public static void main(String[] args){
         // Grid Traveller
@@ -13,17 +11,27 @@ public class GFG_DynamicProgrammingProblems {
         System.out.printf("Grid Traveller Matrix m: %s, n: %s, ways: %s\n", 3, 2, gridTraveller(3, 2));
         System.out.printf("Grid Traveller Matrix m: %s, n: %s, ways: %s\n", 3, 3, gridTraveller(3, 3));
         System.out.printf("Grid Traveller Matrix m: %s, n: %s, ways: %s\n", 18, 18, gridTravellerMemoized(18, 18, new HashMap<>()));
+        System.out.println();
 
         // Can Sum
-        System.out.println(canSum(7, new int[]{2, 4}));
-        System.out.println(canSum(7, new int[]{5, 1, 4, 2, 7}));
-        System.out.println(canSumMemoized(300, new int[]{7, 14}, new HashMap<>()));
+        System.out.printf("Can Sum %s: %s\n", Arrays.toString(new int[]{2, 4}), canSum(7, new int[]{2, 4}));
+        System.out.printf("Can Sum %s: %s\n", Arrays.toString(new int[]{5, 1, 4, 2, 7}), canSum(7, new int[]{5, 1, 4, 2, 7}));
+        System.out.printf("Can Sum %s: %s\n", Arrays.toString(new int[]{7, 14}), canSumMemoized(300, new int[]{7, 14}, new HashMap<>()));
+        System.out.println();
 
         // How Sum
         System.out.println(howSum(7, new int[]{2, 4}));
         System.out.println(howSum(7, new int[]{5, 1, 4, 2, 7}));
         System.out.println(howSumRefactored(7, new int[]{5, 1, 4, 2, 7}));
-        System.out.println(howSumRefactoredAndMemoized(7, new int[]{5, 1, 4, 2, 7}, new HashMap<>()));
+        System.out.println(howSumRefactoredAndMemoized(100, new int[]{5, 2, 25, 1}, new HashMap<>()));
+        System.out.println();
+
+        // Best Sum
+        System.out.println(bestSum(7, new int[]{2, 4}));
+        System.out.println(bestSum(7, new int[]{5, 1, 4, 2, 7}));
+        System.out.println(bestSum(7, new int[]{5, 1, 4, 2, 7}));
+        System.out.println(bestSum(8, new int[]{1, 4, 5}));
+        System.out.println(bestSumMemoized(100, new int[]{1, 2, 5, 25}, new HashMap<>()));
     }
 
     /**
@@ -294,8 +302,9 @@ public class GFG_DynamicProgrammingProblems {
         if(target == 0) return new ArrayList<>();
 
         for(int num: nums){
-            if(target-num >= 0){
-                List<Integer> list = howSumRefactored(target-num, nums);
+            int remainder = target - num;
+            if(remainder >= 0){
+                List<Integer> list = howSumRefactored(remainder, nums);
                 if(list != null){
                     list.add(num);
                     return list;
@@ -310,16 +319,18 @@ public class GFG_DynamicProgrammingProblems {
      * Giving us: m * n processing time, hence we have:
      *      O(m * n) time
      *
-     * Asides the stack space of m, we have a list size of m maximally, and m size memoir, hence:
-     *      O(m) space
+     * Asides the stack space of m, we have the memoir which takes m keys (all sub-problems of m), which have a list of
+     * integers possibly of size m, hence we have: m + m*m
+     *      O(m^2) space
      * **/
     public static List<Integer> howSumRefactoredAndMemoized(int target, int[] nums, Map<Integer, List<Integer>> memo){
         if(memo.containsKey(target)) return memo.get(target);
         if(target == 0) return new ArrayList<>();
 
         for(int num: nums){
-            if(target-num >= 0){
-                List<Integer> list = howSumRefactored(target-num, nums);
+            int remainder = target - num;
+            if(remainder >= 0){
+                List<Integer> list = howSumRefactored(remainder, nums);
                 if(list != null){
                     list.add(num);
                     memo.put(target, list);
@@ -329,6 +340,72 @@ public class GFG_DynamicProgrammingProblems {
         }
         memo.put(target, null);
         return null;
+    }
+
+
+
+    /**
+     * Solution 1: DP Brute force, following the analysis above
+     *      O(n^m) time
+     *      O(m^2) space, reasoning is we store bestList arraylist on each recursive call which is maximally m in size,
+     *      and we have a recursive stack depth of m, hence we have m * m => m^2
+     */
+    public static List<Integer> bestSum(int target, int[] nums){
+        if(target == 0) return new ArrayList<>();
+
+        List<Integer> bestList = null;
+
+        for(int num: nums){
+            int remainder = target - num;
+            if(remainder >= 0){
+                List<Integer> list = bestSum(remainder, nums);
+                if(list != null) {
+                    list.add(num);
+
+                    if(bestList == null || list.size() < bestList.size()) {
+                        bestList = list;
+                    }
+                }
+            }
+        }
+        return bestList;
+    }
+
+    /**
+     * Solution 1: DP Memo, following the analysis above:
+     * Here alongside the n * m operations to be performed, we copy the list in each of its operation, which is size m maximally.
+     * So we have n * m * m => m^2 * n
+     *      O(m^2 * n) time, as follows from above (WITH copying the new list)
+     *      O(m^2) space, reasoning is we store bestList arraylist on each recursive call which is maximally m in size,
+     *      and we have a recursive stack depth of m. hence we have m * m => m^2
+     *      we also have the memo, storing m keys possible (sub-problem of m) with m size lists as value, giving  us m^2
+     *          Hence we have m^2 + m^2 => 2m^2 => (m^2)
+     *
+     *
+     * NB: It's advised to copy to a new list especially while using memoization
+     */
+    public static List<Integer> bestSumMemoized(int target, int[] nums, Map<Integer,List<Integer>> memo){
+        if(memo.containsKey(target)) return memo.get(target);
+        if(target == 0) return new ArrayList<>();
+
+        List<Integer> bestList = null;
+
+        for(int num: nums){
+            int remainder = target - num;
+            if(remainder >= 0){
+                List<Integer> resultList = bestSumMemoized(remainder, nums, memo);
+                if(resultList != null) {
+                    List<Integer> list = new ArrayList<>(resultList);
+                    list.add(num);
+
+                    if(bestList == null || list.size() < bestList.size()) {
+                        bestList = list;
+                    }
+                }
+            }
+        }
+        memo.put(target, bestList);
+        return bestList;
     }
 
 }
