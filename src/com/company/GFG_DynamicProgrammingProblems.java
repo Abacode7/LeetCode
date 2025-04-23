@@ -32,6 +32,19 @@ public class GFG_DynamicProgrammingProblems {
         System.out.println(bestSum(7, new int[]{5, 1, 4, 2, 7}));
         System.out.println(bestSum(8, new int[]{1, 4, 5}));
         System.out.println(bestSumMemoized(100, new int[]{1, 2, 5, 25}, new HashMap<>()));
+        System.out.println();
+
+        // Count Construct
+        System.out.println(canConstruct("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
+        System.out.println(canConstructMemoized("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}, new HashMap<>()));
+        System.out.println(countConstruct("purple", new String[]{"purp", "p", "ur", "le", "purpl"})); // 2
+        System.out.println(countConstruct("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"})); // 1
+        System.out.println(countConstructMemoized("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}, new HashMap<>())); //0
+        System.out.println();
+
+
+        // All Construct
+        System.out.println(allConstruct("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
     }
 
     /**
@@ -406,6 +419,136 @@ public class GFG_DynamicProgrammingProblems {
         }
         memo.put(target, bestList);
         return bestList;
+    }
+
+
+
+
+    /**
+     * Solution: Recursive Divide & Conquer
+     * Complexity, with m = target length & n = words length, then we have:
+     * In the worst case we'll have a single letter with is always a prefix of target,
+     * hence tree depth is m, with n branches.
+     * We also account for substring with is linear with respect to m, hence we have:
+     *       O(n^m * m) time
+     *  For space, we have m recursive stack space. We also create substring of size relative to m in each m recursive
+     *  stack call, hence we have:
+     *       O(m^2) space
+     */
+    public static boolean canConstruct(String target, String[] words){
+        if(target.length() == 0) return true;
+
+        for(String word: words){
+            if(target.startsWith(word)){
+                String newTarget = target.substring(word.length());
+                boolean canConstruct = canConstruct(newTarget, words);
+                if(canConstruct) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Solution: Recursive Divide & Conquer with Memoization
+     * Complexity, with m = target length & n = words length, then we have:
+     * In the worst case we'll have m sub-problem, hence tree depth is m, with n branches.
+     * We also account for substring with is linear with respect to m, hence we have:
+     *       O(n * m^2) time
+     *  For space, we have m recursive stack space. We also create substring of size relative to m in each m recursive
+     *  stack call, hence we have:
+     *       O(m^2) space
+     */
+    public static boolean canConstructMemoized(String target, String[] words, Map<String, Boolean> memo){
+        if(memo.containsKey(target)) return memo.get(target);
+        if(target.length() == 0) return true;
+
+        for(String word: words){
+            if(target.startsWith(word)){
+                String newTarget = target.substring(word.length());
+                boolean canConstruct = canConstructMemoized(newTarget, words, memo);
+                if(canConstruct) {
+                    memo.put(target, true);
+                    return true;
+                }
+            }
+        }
+
+        memo.put(target, false);
+        return false;
+    }
+
+
+
+    /**
+     * Solution: Recursive Divide & Conquer
+     * Given m = target length and n = words length
+     *      O(n^m * m) time
+     *      O(m^2) space
+     */
+    public static int countConstruct(String target, String[] words){
+        if(target.length() == 0) return 1;
+
+        int count = 0;
+        for(String word: words){
+            if(target.startsWith(word)){
+                String newTarget = target.substring(word.length());
+                count += countConstruct(newTarget, words);
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Solution: Divide & Conquer with Memoization
+     * Given m = target length and n = words length
+     *      O(m^2 * n) time
+     *      O(m^2) space
+     */
+    public static int countConstructMemoized(String target, String[] words, Map<String, Integer> memo){
+        if(memo.containsKey(target)) return memo.get(target);
+        if(target.length() == 0) return 1;
+
+        int count = 0;
+        for(String word: words){
+            if(target.startsWith(word)){
+                String newTarget = target.substring(word.length());
+                count += countConstructMemoized(newTarget, words, memo);
+            }
+        }
+
+        memo.put(target, count);
+        return count;
+    }
+
+
+    /**
+     * "purple" | {"purp", "p", "ur", "le", "purpl"}
+     * "" | {"purp", "p", "ur", "le", "purpl"}, return []
+     * if we don't find any prefix for the sub-problem we return null
+     */
+    public static List<List<String>> allConstruct(String target, String[] words){
+        if(target.length() == 0) {
+            List<List<String>> baseList = new ArrayList<>();
+            baseList.add(new ArrayList<>());
+            return baseList;
+        }
+
+        List<List<String>> allConstruct = new ArrayList<>();
+
+        for(String word: words){
+            if(target.startsWith(word)){
+                String newTarget = target.substring(word.length());
+                List<List<String>> localConstructs = allConstruct(newTarget, words);
+
+                for(List<String> localConstruct: localConstructs){
+                    localConstruct.add(word);
+                    allConstruct.add(localConstruct);
+                }
+            }
+        }
+
+        return allConstruct;
     }
 
 }
