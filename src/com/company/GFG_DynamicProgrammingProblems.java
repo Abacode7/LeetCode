@@ -45,6 +45,11 @@ public class GFG_DynamicProgrammingProblems {
 
         // All Construct
         System.out.println(allConstruct("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
+        System.out.println(allConstruct("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
+        System.out.println(allConstructMemoized("purple", new String[]{"purp", "p", "ur", "le", "purpl"}, new HashMap<>()));
+        System.out.println(allConstructMemoized("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}, new HashMap<>()));
+        System.out.println(allConstructMemoized("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}, new HashMap<>()));
+        System.out.println();
     }
 
     /**
@@ -526,12 +531,26 @@ public class GFG_DynamicProgrammingProblems {
      * "purple" | {"purp", "p", "ur", "le", "purpl"}
      * "" | {"purp", "p", "ur", "le", "purpl"}, return []
      * if we don't find any prefix for the sub-problem we return null
+     *
+     *      O(n^m * m * n), where n^m is the number of recursive calls, m is the length of substring
+     *      and n is the max possible number of local constructs in each recursive call (which is n since we have n branches).
+     *
+     *      O(m * m * m*n) where m is the recursive call stack, extra m is the substring call, and m*n maximally stores the local construct
+     *
+     *      Typically, for problems like this we just take: O(n^m) time since its exponential already and O(m) space, excluding the
+     *      return value size, since it takes a lot of space.
+     *
+     *      Similar optimisation applies to the allConstructMemoized.
+     *
+     *      NB: The worst case now is no longer: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}
+     *      but a case where we have "eeeeeeeeeeeeeeeeeeeeeeeeeeeeee", new String[]{"e", "ee", "eee", "eeee", "eeeee"} since we
+     *      don't return early, and it requires us to generate arrays for these.
      */
     public static List<List<String>> allConstruct(String target, String[] words){
         if(target.length() == 0) {
-            List<List<String>> baseList = new ArrayList<>();
-            baseList.add(new ArrayList<>());
-            return baseList;
+            List<List<String>> baseConstruct = new ArrayList<>();
+            baseConstruct.add(new ArrayList<>());
+            return baseConstruct;
         }
 
         List<List<String>> allConstruct = new ArrayList<>();
@@ -548,6 +567,33 @@ public class GFG_DynamicProgrammingProblems {
             }
         }
 
+        return allConstruct;
+    }
+
+    public static List<List<String>> allConstructMemoized(String target, String[] words, Map<String, List<List<String>>> memo){
+        if(memo.containsKey(target)) return memo.get(target);
+
+        if(target.length() == 0) {
+            List<List<String>> baseConstruct = new ArrayList<>();
+            baseConstruct.add(new ArrayList<>());
+            return baseConstruct;
+        }
+
+        List<List<String>> allConstruct = new ArrayList<>();
+
+        for(String word: words){
+            if(target.startsWith(word)){
+                String newTarget = target.substring(word.length());
+                List<List<String>> localConstructs = allConstruct(newTarget, words);
+
+                for(List<String> localConstruct: localConstructs){
+                    localConstruct.add(word);
+                    allConstruct.add(localConstruct);
+                }
+            }
+        }
+
+        memo.put(target, allConstruct);
         return allConstruct;
     }
 
