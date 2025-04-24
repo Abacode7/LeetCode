@@ -48,7 +48,28 @@ public class GFG_DynamicProgrammingProblems {
         System.out.println(allConstruct("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
         System.out.println(allConstructMemoized("purple", new String[]{"purp", "p", "ur", "le", "purpl"}, new HashMap<>()));
         System.out.println(allConstructMemoized("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}, new HashMap<>()));
-        System.out.println(allConstructMemoized("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}, new HashMap<>()));
+        //System.out.println(allConstructMemoized("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}, new HashMap<>()));
+        System.out.println();
+
+        // Fib Tabular
+        System.out.println(fibTabular(5));
+        System.out.println(fibTabular(6));
+        System.out.println(fibTabular(7));
+        System.out.println(fibTabular(8));
+        System.out.println();
+
+        // Grid Traveller Tabular
+        System.out.printf("Grid traveller matrix m: %s, n: %s, ways: %s\n", 1, 1, gridTravellerTabular(1, 1));
+        System.out.printf("Grid Traveller Matrix m: %s, n: %s, ways: %s\n", 2, 3, gridTravellerTabular(2, 3));
+        System.out.printf("Grid Traveller Matrix m: %s, n: %s, ways: %s\n", 3, 2, gridTravellerTabular(3, 2));
+        System.out.printf("Grid Traveller Matrix m: %s, n: %s, ways: %s\n", 3, 3, gridTravellerTabular(3, 3));
+        System.out.printf("Grid Traveller Matrix m: %s, n: %s, ways: %s\n", 18, 18, gridTravellerTabular(18, 18));
+        System.out.println();
+
+        // Can Sum Tabular
+        System.out.printf("Can Sum %s %s: %s\n", 7, Arrays.toString(new int[]{2, 4}), canSumTabular(7, new int[]{2, 4}));
+        System.out.printf("Can Sum %s %s: %s\n", 7, Arrays.toString(new int[]{5, 1, 4, 2, 7}), canSumTabular(7, new int[]{5, 1, 4, 2, 7}));
+        System.out.printf("Can Sum %s %s: %s\n", 300, Arrays.toString(new int[]{7, 14}), canSumTabular(300, new int[]{7, 14}));
         System.out.println();
     }
 
@@ -595,6 +616,97 @@ public class GFG_DynamicProgrammingProblems {
 
         memo.put(target, allConstruct);
         return allConstruct;
+    }
+
+
+
+    /**
+     * Given the Fibonacci Function:
+     * n    0   1   2   3   4   5   6
+     * f    0   1   1   2   3   5   8
+     *
+     * (Adding {0: 0} cos it maintains the function )
+     *
+     * The whole idea about Tabulation is such that we make the problem (& sub-problems) the indexes
+     * then we build up the solution from the smallest sub-problem (index) up to the desired problem.
+     *
+     * In this case every n in fn affects the next two sub-problem e.g f(2) is added to f(3) and f(4)
+     * So we can iterate over this list from the base case, adding its solution to the next two values.
+     *
+     * To get f(6), we declare and array of 7, why? cos indexes are 0 based, and we need the problem at 6 in the table.
+     * The value at index n represents the solution to the problem.
+     *
+     * Complexity for fibonacci tabular
+     *  O(n) time
+     *  O(n) space
+     */
+    public static int fibTabular(int n){
+        int[] table = new int[n+1];
+        table[1] = 1; // base case
+
+        int tableLength = table.length;
+
+        for(int i=0; i<tableLength; i++){
+            if(i + 1 < tableLength) table[i+1] += table[i];
+            if(i + 2 < tableLength) table[i+2] += table[i];
+        }
+        return table[n];
+    }
+
+
+
+    /**
+     * Grid Traveller
+     * Given gridT(3, 3) => 6
+     * Since we can go down and right only, it means:
+     *      gridT(3,3) => gridT(3,2) + gridT(2,3)
+     *      gridT(1,3) => gridT(0,3) + gridT(1,2)
+     *      gridT(2,2) => gridT(2,1) + gridT(1,2)
+     *
+     * Observing closely, you'll see gridT(1,2) contributes to gridT(2,2) and gridT(1,3) only
+     * Also knowing that at gridT(1,1) we have only 1 way to travel, hence this is the base case
+     *
+     * Complexity
+     *      O(mn) time
+     *      O(mn) space
+     */
+    public static long gridTravellerTabular(int m, int n){
+        long[][] table  = new long[m+1][n+1];
+        table[1][1] = 1;
+
+        for(int i=0; i<m+1; i++){
+            for(int j=0; j<n+1; j++){
+                if(i+1 < m+1) table[i+1][j] += table[i][j];
+                if(j+1 < n+1) table[i][j+1] += table[i][j];
+            }
+        }
+        return table[m][n];
+    }
+
+
+    /**
+     * The key here, like I earlier mentioned is to find the sub-problems and make them the indexes
+     * target = 7, sub-problems = 6, 5, 4, 3, 2, 1
+     *
+     * Then choose a base case 0 => true, because you can always find the sum of 0 with no elements from the array
+     * Iterate the base solution upwards via the tree branches (which is nums in this case) till you solve for problem
+     *
+     * Complexity
+     *      O(mn) time, where m = target, n is length of nums
+     *      O(m) space
+     */
+    public static boolean canSumTabular(int target, int[] nums){
+        boolean[] table = new boolean[target + 1];
+        table[0] = true;
+
+        for(int i=0; i < nums.length; i++){
+            for(int num: nums){
+                if(table[i]){
+                    if(i + num < target+1) table[i + num] = table[i];
+                }
+            }
+        }
+        return table[target];
     }
 
 }
