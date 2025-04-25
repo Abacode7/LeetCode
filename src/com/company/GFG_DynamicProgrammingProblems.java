@@ -34,7 +34,7 @@ public class GFG_DynamicProgrammingProblems {
         System.out.println(bestSumMemoized(100, new int[]{1, 2, 5, 25}, new HashMap<>()));
         System.out.println();
 
-        // Count Construct
+        // Can, Count Construct
         System.out.println(canConstruct("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
         System.out.println(canConstructMemoized("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}, new HashMap<>()));
         System.out.println(countConstruct("purple", new String[]{"purp", "p", "ur", "le", "purpl"})); // 2
@@ -71,6 +71,25 @@ public class GFG_DynamicProgrammingProblems {
         System.out.printf("Can Sum %s %s: %s\n", 7, Arrays.toString(new int[]{5, 1, 4, 2, 7}), canSumTabular(7, new int[]{5, 1, 4, 2, 7}));
         System.out.printf("Can Sum %s %s: %s\n", 300, Arrays.toString(new int[]{7, 14}), canSumTabular(300, new int[]{7, 14}));
         System.out.println();
+
+
+        // How, Best, All Sum Tabular
+        System.out.printf("How Sum %s %s: %s\n", 7, Arrays.toString(new int[]{2, 4}), howSumTabular(7, new int[]{2, 4}));
+        System.out.printf("How Sum %s %s: %s\n", 7, Arrays.toString(new int[]{5, 1, 4, 2, 7}), howSumTabular(7, new int[]{5, 1, 4, 2, 7}));
+        System.out.printf("How Sum %s %s: %s\n", 8, Arrays.toString(new int[]{1, 4, 2, 3, 6}), howSumTabular(8, new int[]{1, 4, 2, 3, 6}));
+        System.out.printf("Best Sum %s %s: %s\n", 8, Arrays.toString(new int[]{1, 4, 2, 3, 6}), bestSumTabular(8, new int[]{1, 4, 2, 3, 6}));
+        System.out.printf("All Sum %s %s: %s\n", 7, Arrays.toString(new int[]{5, 1, 4, 2, 7}), allSumTabular(7, new int[]{5, 1, 4, 2, 7}));
+        //System.out.printf("How Sum %s %s: %s\n", 300, Arrays.toString(new int[]{7, 14}), howSumTabular(300, new int[]{7, 14}));
+        System.out.println();
+
+
+        // Can, Count Construct Tabular
+        System.out.println(canConstructTabular("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
+        System.out.println(canConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
+        System.out.println(canConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
+        System.out.println(countConstructTabular("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
+        System.out.println(countConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
+        System.out.println(countConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
     }
 
     /**
@@ -700,6 +719,7 @@ public class GFG_DynamicProgrammingProblems {
         table[0] = true;
 
         for(int i=0; i < nums.length; i++){
+            if(!table[i]) continue;
             for(int num: nums){
                 if(table[i]){
                     if(i + num < target+1) table[i + num] = table[i];
@@ -707,6 +727,208 @@ public class GFG_DynamicProgrammingProblems {
             }
         }
         return table[target];
+    }
+
+
+    /**
+     * Given: target = 7, nums = {5, 1, 4, 2, 7}
+     *
+     *  0   1   2        3       4       5         6         7
+     * []  [1] [2]     [1 2]     [4]     [5]      [15]       [7]
+     *        [1 1]              [1 4]
+     *
+     *                                   7
+     *              2(-5)      6(-1)          3(-4)        0(-7)
+     *  1(-1)   0(-2)
+     *
+     * We use the same intuition as in canSumTabular AND we add a little more optimization
+     * Optimization: Since we're building bottom up, we can use focus on the path upwards from the base case 0
+     * Meaning we don't need to solve sub-problems if they've not been effected by smaller sub-problems
+     *
+     * In implementation: You see this with the use of null, and the skipping of cases which remain null.
+     *
+     * Complexity: Given m = target and n = nums length
+     *      O(m^2 * n) time, we perform m X n operations in loop, and in each iteration we do copy list values of length m
+     *      O(m^2) space, where m is the initial list of sub-problems, with each sub-problem having a list maximally of m
+     */
+    public static List<Integer> howSumTabular(int target, int[] nums){
+        List<List<Integer>> table = new ArrayList<>(target+1);
+
+        for(int i=0; i<target+1; i++) table.add(null);
+
+        table.set(0, new ArrayList<>()); // base case
+
+        for(int i=0; i<target+1; i++){
+            List<Integer> currentConstruct = table.get(i);
+            if(currentConstruct == null) continue;
+
+            for(int num: nums){
+                if(i + num < target+1){
+                    List<Integer> newConstruct = new ArrayList<>(currentConstruct);
+                    newConstruct.add(num);
+
+                    table.set(i+num, newConstruct);
+                }
+            }
+        }
+
+        return table.get(target);
+    }
+
+
+
+    /**
+     * Best Sum Tabular is very similar to How Sum
+     * Just that in this case before setting the solution for the sub-problems, we find the BEST solution for the sub-problems
+     * by comparing the new solution with the solution present.
+     *
+     * Complexity:
+     *      O(m^2 * n) time,
+     *      O(m^2) space
+     */
+    public static List<Integer> bestSumTabular(int target, int[] nums){
+        List<List<Integer>> table = new ArrayList<>(target+1);
+
+        for(int i=0; i<target+1; i++) table.add(null);
+
+        table.set(0, new ArrayList<>()); // base case
+
+        for(int i=0; i<target+1; i++){
+            List<Integer> currentConstruct = table.get(i);
+            if(currentConstruct == null) continue;
+            for(int num: nums){
+                if(i + num < target+1){
+                    List<Integer> newConstruct = new ArrayList<>(currentConstruct);
+                    newConstruct.add(num);
+
+                    if(table.get(i+num) == null) table.set(i+num, newConstruct);
+                    else{
+                        if(table.get(i+num).size() > newConstruct.size()){
+                            table.set(i+num, newConstruct);
+                        }
+                    }
+                }
+            }
+
+            if(table.get(target) != null) return table.get(target);
+        }
+
+        return new ArrayList<>();
+    }
+
+
+
+    /**
+     * All Sum Tabular
+     * This provides all possible patterns to achieve the target
+     */
+    public static List<List<Integer>> allSumTabular(int target, int[] nums){
+        List<List<List<Integer>>> table = new ArrayList<>();
+
+        for(int i=0; i<target+1; i++) table.add(new ArrayList<>());
+
+        table.get(0).add(new ArrayList<>()); // base case
+
+        for(int i=0; i<target+1; i++){
+            List<List<Integer>> currentConstructs = table.get(i);
+            for(int num: nums){
+                if(i + num < target+1){
+                    List<List<Integer>> futureConstruct = table.get(i+num);
+                    for(List<Integer> currentConstruct: currentConstructs){
+                        List<Integer> newConstruct = new ArrayList<>(currentConstruct);
+                        newConstruct.add(num);
+
+                        futureConstruct.add(newConstruct);
+                    }
+                }
+            }
+        }
+
+        return table.get(target);
+    }
+
+
+
+    /***
+     * Given: target = "abcdef" and strings {"ab", "abc", "cd", "def", "abcd"}
+     *
+     * Similarly, with other problems, we break down target = "abcdef" into sub-problems
+     * to be solved. That is, we have: "a", "ab", "abc", "abcd", "abcde", "abcdef"
+     *
+     * We can store them in an array in this format:
+     *      0       1       2        3           4           5          6
+     *      [                                                             ]
+     *      a       b       c        d           e           f
+     *
+     *      a       ab      abc     abcd        abcde       abcdef
+     *
+     *      Where index 0 means characters up to and excluding 0, so:
+     *      at 0 we have "" (empty string)
+     *      at 1 we have "a"
+     *      at 2 we have "ab"
+     *      at 5 we have "abcde"
+     *      at 6 we have the full target
+     *
+     *      The contents of the array will have the solutions of the sub-problems: boolean in the case of canConstruct
+     *      Initialize your base case at 0, which is: "" and has a solution of true
+     *      Each index i, represents:
+     *      i.  The end index (exclusive) of the previous sub-problem.
+     *      ii. The start index of the next sub-problem branch you intend checking.
+     *
+     * Algorithm Complexity
+     *      O(m^2 n) time,
+     *      O(m) space
+     */
+    public static boolean canConstructTabular(String target, String[] words){
+        int targetLength = target.length();
+        boolean[] table = new boolean[targetLength+1];
+        table[0] = true;
+
+        for(int i=0; i<targetLength+1; i++){
+            if(!table[i]) continue;
+
+            for(String word: words){
+                int endIndex = i + word.length();
+                if(endIndex <= targetLength && word.equals(target.substring(i, endIndex))){
+                    table[endIndex] = table[i];
+                }
+            }
+        }
+        return table[targetLength];
+    }
+
+
+
+    /**
+     *    0   1   2   3   4   5   6
+     *  [ 1                         ]
+     *    a   b   c   d   e   f
+     *''  a   ab  abc   abcde
+     *            abcd     abcdef
+     *
+     * Algorithm Complexity
+     *      O(m^2 n) time,
+     *      O(m) space
+     */
+    public static int countConstructTabular(String target, String[] words){
+        int targetLength = target.length();
+        int[] table = new int[targetLength+1];
+        table[0] = 1;
+
+        for(int i=0; i < targetLength+1; i++){
+            if(table[i] == 0) continue;
+
+            for(String word: words){
+                int endIndex = i + word.length();
+                if(endIndex > targetLength) continue;
+
+                if(word.equals(target.substring(i, endIndex))){
+                    table[endIndex] += table[i];
+                }
+            }
+        }
+
+        return table[targetLength];
     }
 
 }
