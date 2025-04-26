@@ -83,13 +83,37 @@ public class GFG_DynamicProgrammingProblems {
         System.out.println();
 
 
-        // Can, Count Construct Tabular
-        System.out.println(canConstructTabular("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
-        System.out.println(canConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
-        System.out.println(canConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
-        System.out.println(countConstructTabular("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
-        System.out.println(countConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
-        System.out.println(countConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
+        // Can, Count, All Construct Tabular
+        System.out.printf("Can Construct Tabular %s %s: %s\n", "purple", Arrays.toString(new String[]{"purp", "p", "ur", "le", "purpl"}),
+                canConstructTabular("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
+        System.out.printf("Can Construct Tabular %s %s: %s\n", "abcdef", Arrays.toString(new String[]{"ab", "abc", "cd", "def", "abcd"}),
+                canConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
+        System.out.printf("Can Construct Tabular %s %s: %s\n", "eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", Arrays.toString(new String[]{"e", "ee", "eee", "eeee", "eeeee"}),
+                canConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
+        System.out.println();
+
+
+        // Count Construct Tabular
+        System.out.printf("Count Construct Tabular %s %s: %s\n", "purple", Arrays.toString(new String[]{"purp", "p", "ur", "le", "purpl"}),
+                countConstructTabular("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
+        System.out.printf("Count Construct Tabular %s %s: %s\n", "abcdef", Arrays.toString(new String[]{"ab", "abc", "cd", "def", "abcd"}),
+                countConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
+        System.out.printf("Count Construct Tabular %s %s: %s\n", "abcdef", Arrays.toString(new String[]{"ab", "abc", "cd", "def", "abcd", "ef"}),
+                countConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd", "ef"}));
+        System.out.printf("Count Construct Tabular %s %s: %s\n", "eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", Arrays.toString(new String[]{"e", "ee", "eee", "eeee", "eeeee"}),
+                countConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
+        System.out.println();
+
+
+        // All Construct Tabular
+        System.out.printf("All Construct Tabular %s %s: %s\n", "purple", Arrays.toString(new String[]{"purp", "p", "ur", "le", "purpl"}),
+                allConstructTabular("purple", new String[]{"purp", "p", "ur", "le", "purpl"}));
+        System.out.printf("All Construct Tabular %s %s: %s\n", "abcdef", Arrays.toString(new String[]{"ab", "abc", "cd", "def", "abcd"}),
+                allConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd"}));
+        System.out.printf("All Construct Tabular %s %s: %s\n", "abcdef", Arrays.toString(new String[]{"ab", "abc", "cd", "def", "abcd", "ef"}),
+                allConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd", "ef"}));
+        System.out.printf("all Construct Tabular %s %s: %s\n", "eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", Arrays.toString(new String[]{"e", "ee", "eee", "eeee", "eeeee"}),
+                allConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
     }
 
     /**
@@ -929,6 +953,60 @@ public class GFG_DynamicProgrammingProblems {
         }
 
         return table[targetLength];
+    }
+
+
+
+    /**
+     *
+     * Given: target = "abcdef" and strings {"ab", "abc", "cd", "def", "abcd", "ef"},
+     * ""       a       ab      abc     abcd        abcde       abcdef
+      [[]]              [ab]             [abcd]                  [abc, def]
+     *                          [abc]   [ab, cd]                [abcd, ef]
+     *                                                          [ab, cd, ef]
+     *
+     *      0   1   2   3   4   5   6
+     * ''   a   b   c   d   e   f
+     *
+     * Complexity
+     * Since we're exploring all possible ways to construct the target,
+     * we can't escape doing a Bruteforce (i.e exploring all of it)
+     * Hence we have an exponential complexity for the tree
+     *      ~ O(n^m) time, we're exploring all valid paths of the tree
+     *      ~ O(n^m) space, each space in the table holds a list of a possible m items each of which is a base solution
+     *      of the tree, hence n^m
+     */
+    public static List<List<String>> allConstructTabular(String target, String[] words){
+        int targetLength = target.length();
+        List<List<List<String>>> table = new ArrayList<>(targetLength+1);
+
+        for(int i=0; i<targetLength+1; i++) table.add(new ArrayList<>());
+
+        List<List<String>> baseCase = table.get(0);
+        baseCase.add(new ArrayList<>());
+        table.set(0, baseCase);
+
+        for(int i=0; i<targetLength+1; i++){
+            List<List<String>> baseConstructs = table.get(i);
+            if(baseConstructs.isEmpty()) continue;
+
+            for(String word: words){
+                int endIndex = i + word.length();
+
+                if(endIndex > targetLength) continue;
+
+                if(word.equals(target.substring(i, endIndex))){
+                    List<List<String>> futureConstruct = table.get(endIndex);
+                    for(List<String> baseConstruct: baseConstructs){
+                        List<String> newConstruct = new ArrayList<>(baseConstruct);
+                        newConstruct.add(word);
+                        futureConstruct.add(newConstruct); // This sets the valid within the table as well
+                    }
+                }
+            }
+        }
+
+        return table.get(targetLength);
     }
 
 }
