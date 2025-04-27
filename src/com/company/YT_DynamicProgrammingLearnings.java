@@ -82,6 +82,7 @@ public class YT_DynamicProgrammingLearnings {
         System.out.printf("How Sum %s %s: %s\n", 8, Arrays.toString(new int[]{1, 4, 2, 3, 6}), howSumTabular(8, new int[]{1, 4, 2, 3, 6}));
         System.out.printf("Best Sum %s %s: %s\n", 8, Arrays.toString(new int[]{1, 4, 2, 3, 6}), bestSumTabular(8, new int[]{1, 4, 2, 3, 6}));
         System.out.printf("All Sum %s %s: %s\n", 7, Arrays.toString(new int[]{5, 1, 4, 2, 7}), allSumTabular(7, new int[]{5, 1, 4, 2, 7}));
+        System.out.printf("All Sum %s %s: %s\n", 11, Arrays.toString(new int[]{1,5,6}), allSumTabular(11, new int[]{1,5,6}));
         //System.out.printf("How Sum %s %s: %s\n", 300, Arrays.toString(new int[]{7, 14}), howSumTabular(300, new int[]{7, 14}));
         System.out.println();
 
@@ -1016,6 +1017,89 @@ public class YT_DynamicProgrammingLearnings {
 
         return table.get(targetLength);
     }
+
+    /**
+     *      Given target: 11, denominations: {1, 5, 6}
+     *
+     *      Case 1: INFINITE AMOUNT OF EACH DENOMINATION
+     *      To get this, we explore each denomination path i.e solve for each (target - denomination) using all denominations
+     *
+     *
+     *      0   1   2   3   4   5   6   7   8   9   10  11
+     *     []  [1]             [5] [6]
+     *            [1,1]           [1,5][1,6]
+     *               [1,1,1]        [1,1,5][1,1,6]
+     *                   [1,1,1,1]    [1,1,1,5][1,1,1,6]
+     *                        ...
+     *                            [5,1]            [5,5][5,6]
+     *                                [6,1]             [6,5]
+     *                                    [7,1]
+     *
+     *
+     *
+     *
+     *                                 11  | {1, 5, 6}
+     *              10(-1)                   6(-5)           0(-11)
+     *       9(-1)    5(-5) 4(-6)         5(-1)
+     *    8(-1)     4(-1)                 4(-1)
+     *  7(-1)...
+     *
+     *  Result: 11 [1, 5, 6]:
+     *  [[5, 6], [1, 1, 1, 1, 1, 6], [6, 5], [1, 5, 5], [5, 1, 5], [1, 1, 1, 1, 1, 1, 5], [1, 1, 1, 1, 6, 1], [5, 5, 1],
+     *  [1, 1, 1, 1, 1, 5, 1], [1, 1, 1, 6, 1, 1], [1, 1, 1, 1, 5, 1, 1], [1, 1, 6, 1, 1, 1], [1, 1, 1, 5, 1, 1, 1], [1, 6, 1, 1, 1, 1],
+     *  [1, 1, 5, 1, 1, 1, 1], [6, 1, 1, 1, 1, 1], [1, 5, 1, 1, 1, 1, 1], [5, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+     *
+     *  For TABULAR:
+     *  The dynamic programming relation is: Given target = m, where x1...xn are elements of arr n
+     *      *      dp(n) = dp(m) OR dp(m-x2) or dp(m-x3) or ... or dp(m-xn)
+     *
+     *      Taking dp(m-x2) and changing to dp(m), we have:
+     *            dp(m) = dp(m + x2)
+     *            meaning each dp(m) affects forward dp(m+x1), dp(m+x2), ...., dp(m+xn)
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *     Case 1: SINGLE AMOUNT OF EACH DENOMINATION
+     *     To get this we explore two paths, path with denomination (target-denomination)
+     *
+     *                      11{1,5,6}
+     *            11{1,5}               5{1,5}
+     *     11{1}       6{1}         5{1}       0{1}
+     *  11{}   10{}     6{}      5{}    5{}  4{}
+     *
+     *
+     * Tree View with Paths Shown:
+     *
+     *                      11{1,5,6}
+     *            11{1,5} ()              5{1,5}(6)
+     *     11{1}()       6{1} (5)        5{1}(6)       0{1}(6,5)
+     *  11{}()   10{}(1)    6{}(5)  5{}(5,1)     5{}(6)  4{}(6,1)
+     *
+     *
+     *  Result: 11 [1, 5, 6]:
+     *  (), (1), (5), (5,1), (6), (6,1), (6,5)
+     *
+     *
+     *  For TABULAR:
+     *  The dynamic programming relation is: Given target = m, arr[0...n-1] n
+     *      *     if(arr[n-1] > m)
+     *      *          dp(m,n) = dp(m,n-1)
+     *      *    else
+     *      *          dp(m,n) = dp(m,n-1) OR dp(m-arr[n-1],n-1)
+     *      *
+     *      *     This means dp(m,n-1) affects d(m,n):
+     *      *      changing dp(m,n-1) to dp(m,n) => dp(m,n) becomes dp(m,n+1)
+     *      *      changing dp(m-arr[n-1],n-1) to dp(m,n) => dp(m,n) becomes dp(m+arr[n-1],n+1)
+     *
+     *      Each dp(m,n) affects forward: dp(m,n+1) & dp(m+arr[n-1],n+1)
+     *
+     */
 
 }
 
