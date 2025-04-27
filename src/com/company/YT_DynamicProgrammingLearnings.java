@@ -1022,6 +1022,7 @@ public class YT_DynamicProgrammingLearnings {
      *      Given target: 11, denominations: {1, 5, 6}
      *
      *      Case 1: INFINITE AMOUNT OF EACH DENOMINATION
+     *      (like PERMUTATION which allows multiple selection for its arrangement)
      *      To get this, we explore each denomination path i.e solve for each (target - denomination) using all denominations
      *
      *
@@ -1066,6 +1067,7 @@ public class YT_DynamicProgrammingLearnings {
      *
      *
      *     Case 1: SINGLE AMOUNT OF EACH DENOMINATION
+     *     (like combination which allows only a single selection for its purposes)
      *     To get this we explore two paths, path with denomination (target-denomination)
      *
      *                      11{1,5,6}
@@ -1073,17 +1075,26 @@ public class YT_DynamicProgrammingLearnings {
      *     11{1}       6{1}         5{1}       0{1}
      *  11{}   10{}     6{}      5{}    5{}  4{}
      *
+     *  Given: 11, {1,5,6}
+     *                        11,3
+     *                11,2                5,2
+     *          11,1       6,1         5,1       0,1
+     *       11,0  10,0   6,0 5,0    5,0  4,0
+     *
      *
      * Tree View with Paths Shown:
      *
-     *                      11{1,5,6}
-     *            11{1,5} ()              5{1,5}(6)
-     *     11{1}()       6{1} (5)        5{1}(6)       0{1}(6,5)
-     *  11{}()   10{}(1)    6{}(5)  5{}(5,1)     5{}(6)  4{}(6,1)
+     *                       11{1,5,6}
+     *             11{1,5}()                  5{1,5}(6)
+     *     11{1}()         6{1}(5)          5{1}()       0{1}(5)
+     *  11{}() 10{}(1)  6{}() 5{}(1)     5{}() 4{}(1)
      *
      *
      *  Result: 11 [1, 5, 6]:
-     *  (), (1), (5), (5,1), (6), (6,1), (6,5)
+     *  [5, 6] - It selects on the valid result that yields 11, without fiddling with their arrangement.
+     *
+     *  Observe paths: (), (1), (5), (1,5), (6), (1,6), (5,6)
+     *  It gives us all possible selection which still fulfill the constraints of being <= 11
      *
      *
      *  For TABULAR:
