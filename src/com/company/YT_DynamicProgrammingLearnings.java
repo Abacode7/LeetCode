@@ -118,6 +118,13 @@ public class YT_DynamicProgrammingLearnings {
                 allConstructTabular("abcdef", new String[]{"ab", "abc", "cd", "def", "abcd", "ef"}));
         // System.out.printf("all Construct Tabular %s %s: %s\n", "eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", Arrays.toString(new String[]{"e", "ee", "eee", "eeee", "eeeee"}),
         //        allConstructTabular("eeeeeeeeeeeeeeeeeeeeeeeeeeeeef", new String[]{"e", "ee", "eee", "eeee", "eeeee"}));
+        System.out.println();
+
+
+        // Combination Sum
+        System.out.printf("All Sum: %s\n", allSumTabular(4, new int[]{1,2,3}));
+        System.out.printf("All Sum Combination: %s\n", combinationAllSumTarget(4, new int[]{1,2,3}, 3));
+        System.out.printf("All Sum Combination Less/Equal Target: %s\n", combinationAllSumLessEqualsTarget(4, new int[]{1,2,3}, 3));
     }
 
     /**
@@ -1018,6 +1025,9 @@ public class YT_DynamicProgrammingLearnings {
         return table.get(targetLength);
     }
 
+
+
+
     /**
      *      Given target: 11, denominations: {1, 5, 6}
      *
@@ -1108,9 +1118,70 @@ public class YT_DynamicProgrammingLearnings {
      *      *      changing dp(m,n-1) to dp(m,n) => dp(m,n) becomes dp(m,n+1)
      *      *      changing dp(m-arr[n-1],n-1) to dp(m,n) => dp(m,n) becomes dp(m+arr[n-1],n+1)
      *
-     *      Each dp(m,n) affects forward: dp(m,n+1) & dp(m+arr[n-1],n+1)
+     *      Each dp(m,n) affects forward: dp(m,n+1) & dp(m+arr[n-1],n+1)'
+     *
+     *
+     *
+     *
+     *
+     *      Patterns
+     *      Multi-selection, infinite
+     *      dp(target) = dp(target-arr[0]) OR...OR dp(target-arr[n-1])
+     *
+     *      Selection, infinite
+     *      dp(target, n) = dp(target, n-1) OR dp(target-arr[n-1], n)
+     *
+     *      Selection, not infinite
+     *      dp(target, n) = dp(target, n-1) OR dp(target-arr[n-1], n-1)
      *
      */
+
+
+    static List<List<Integer>> combinationAllSumTarget(int target, int[] arr, int n){
+        List<List<Integer>> weightCombinations = new ArrayList<>();
+        if(target == 0) {
+            weightCombinations.add(new ArrayList<>());
+            return weightCombinations;
+        }
+        if(n == 0) return weightCombinations;
+
+        List<List<Integer>> firstSubWeights = combinationAllSumTarget(target, arr, n-1);
+        weightCombinations.addAll(firstSubWeights);
+
+        if(arr[n-1] <= target){
+            List<List<Integer>> secondSubWeights = combinationAllSumTarget(target-arr[n-1], arr, n-1);
+
+            for(List<Integer> secondSubWeight: secondSubWeights){
+                secondSubWeight.add(arr[n-1]);
+                weightCombinations.add(secondSubWeight);
+            }
+        }
+
+        return weightCombinations;
+    }
+
+
+    static List<List<Integer>> combinationAllSumLessEqualsTarget(int target, int[] arr, int n){
+        List<List<Integer>> weightCombinations = new ArrayList<>();
+        if(target == 0 || n == 0) {
+            weightCombinations.add(new ArrayList<>());
+            return weightCombinations;
+        }
+
+        List<List<Integer>> firstSubWeights = combinationAllSumLessEqualsTarget(target, arr, n-1);
+        weightCombinations.addAll(firstSubWeights);
+
+        if(arr[n-1] <= target){
+            List<List<Integer>> secondSubWeights = combinationAllSumLessEqualsTarget(target-arr[n-1], arr, n-1);
+
+            for(List<Integer> secondSubWeight: secondSubWeights){
+                secondSubWeight.add(arr[n-1]);
+                weightCombinations.add(secondSubWeight);
+            }
+        }
+
+        return weightCombinations;
+    }
 
 }
 
