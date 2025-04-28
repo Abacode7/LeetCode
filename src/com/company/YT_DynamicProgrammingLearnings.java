@@ -124,6 +124,7 @@ public class YT_DynamicProgrammingLearnings {
         // Combination Sum
         System.out.printf("All Sum: %s\n", allSumTabular(4, new int[]{1,2,3}));
         System.out.printf("All Sum Combination: %s\n", combinationAllSumTarget(4, new int[]{1,2,3}, 3));
+        System.out.printf("All Sum Combination Infinite: %s\n", combinationInfiniteAllSumTarget(4, new int[]{1,2,3}, 3));
         System.out.printf("All Sum Combination Less/Equal Target: %s\n", combinationAllSumLessEqualsTarget(4, new int[]{1,2,3}, 3));
     }
 
@@ -1134,6 +1135,10 @@ public class YT_DynamicProgrammingLearnings {
      *      Selection, not infinite
      *      dp(target, n) = dp(target, n-1) OR dp(target-arr[n-1], n-1)
      *
+     *
+     *      NB: The base case depends on whether you're focusing on returning values of the edges
+     *      or a base value at the leaf node.
+     *
      */
 
 
@@ -1173,6 +1178,30 @@ public class YT_DynamicProgrammingLearnings {
 
         if(arr[n-1] <= target){
             List<List<Integer>> secondSubWeights = combinationAllSumLessEqualsTarget(target-arr[n-1], arr, n-1);
+
+            for(List<Integer> secondSubWeight: secondSubWeights){
+                secondSubWeight.add(arr[n-1]);
+                weightCombinations.add(secondSubWeight);
+            }
+        }
+
+        return weightCombinations;
+    }
+
+
+    static List<List<Integer>> combinationInfiniteAllSumTarget(int target, int[] arr, int n){
+        List<List<Integer>> weightCombinations = new ArrayList<>();
+        if(target == 0) {
+            weightCombinations.add(new ArrayList<>());
+            return weightCombinations;
+        }
+        if(n == 0) return weightCombinations;
+
+        List<List<Integer>> firstSubWeights = combinationInfiniteAllSumTarget(target, arr, n-1);
+        weightCombinations.addAll(firstSubWeights);
+
+        if(arr[n-1] <= target){
+            List<List<Integer>> secondSubWeights = combinationInfiniteAllSumTarget(target-arr[n-1], arr, n);
 
             for(List<Integer> secondSubWeight: secondSubWeights){
                 secondSubWeight.add(arr[n-1]);

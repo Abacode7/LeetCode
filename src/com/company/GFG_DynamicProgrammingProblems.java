@@ -20,6 +20,54 @@ public class GFG_DynamicProgrammingProblems {
     }
 
     /**
+     * - Find the different weights combinations <= W
+     * - Find the value for which it is maximised
+     *
+     *  W = 4 and wt = [4, 5, 1]
+     *           val = [1, 2, 3]
+     *
+     *
+     *                          4{4, 5, 1}
+     *            4{4, 5}()                     3{4,5}(1)
+     *     4{4}()                                      3{4}()
+     *
+     * 4{}()   0{}(4)                                  3{}()
+     *
+     *
+     * dp(W, n) = dp(W, n-1) OR dp(W-arr[n-1], n-1)
+     */
+
+    static int knapsack(int W, int val[], int wt[]) {
+        // code here
+        int wtLength = wt.length;
+        int[][] memo = new int[W+1][wt.length+1];
+
+        for(int i=0; i < W+1; i++){
+            for(int j=0; j < wtLength+1; j++){
+                memo[i][j] = -1;
+            }
+        }
+        return knapsack(W, val, wt, wtLength, memo);
+    }
+
+    static int knapsack(int W, int val[], int wt[], int wtLength, int[][] memo) {
+        // code here
+        if(W == 0 || wtLength == 0) return 0;
+        if(memo[W][wtLength] != -1) return memo[W][wtLength];
+
+        int valueWithoutWeight = knapsack(W, val, wt, wtLength-1, memo);
+
+        int valueWithWeight = 0;
+        if(wt[wtLength-1] <= W){
+            valueWithWeight = knapsack(W-wt[wtLength-1], val, wt, wtLength-1, memo);
+            valueWithWeight += val[wtLength-1];
+        }
+
+        memo[W][wtLength] = Math.max(valueWithoutWeight, valueWithWeight);
+        return memo[W][wtLength];
+    }
+
+    /**
      * - Find the different weights combinations <= 4
      * - Find the value for which it is maximised
      *
@@ -30,10 +78,9 @@ public class GFG_DynamicProgrammingProblems {
      *      4{1}              0{1}
      *  4{}    3{}
      *
-     *
-     *
+     * This solution works, but takes extra memory in saving all possible paths first before finding the
      */
-    static int knapsack(int W, int val[], int wt[]) {
+    static int knapsackOne(int W, int val[], int wt[]) {
         // code here
         List<List<Integer>> weightCombinations = findPossibleWeightCombinations(W, wt, wt.length);
         if(weightCombinations.isEmpty()) return 0;
@@ -85,6 +132,7 @@ public class GFG_DynamicProgrammingProblems {
 
         return weightToValue;
     }
+
 
 
 
@@ -148,8 +196,11 @@ public class GFG_DynamicProgrammingProblems {
     }
 
 
+
+
     /**
-     * This allows for Selection, which comes with infinite supply
+     * This allows for Selection, which comes with infinite supply.
+     *
      */
     public int countCoinChange(int coins[], int sum) {
         // code here.
@@ -173,5 +224,105 @@ public class GFG_DynamicProgrammingProblems {
 
         memo[sum][coinsLength] = totalWays;
         return totalWays;
+    }
+
+
+
+    /**
+     * coins [25, 10, 5], sum = 30
+     *
+     *                  30{25,10,5}
+     *          30{25,10}.        25{25,10,5}
+     *   30{25}.   20{25}.      25{25,10}   15{25,10,5}
+     *
+     *  *                  30{10,5,25}
+     *          30{10,5}.          5{10,5,25}
+     *                            5{10,5}.
+     *                      5{10}.    0{10,5}
+     *
+     *      * 0.....30
+     *      * [0...n-1] where n is the lenght of coins
+     *      *
+     *      * dp(sum,n) = dp(sum,n-1) OR dp(sum-arr[n-1], n)
+     * */
+    public int minCoins(int coins[], int sum) {
+        // code here
+        int[][] memo = new int[sum+1][coins.length+1];
+        for(int[] row: memo){
+            Arrays.fill(row, -2);
+        }
+        return minCoins(coins, coins.length, sum, memo);
+    }
+
+    private int minCoins(int coins[], int coinsLength, int sum, int[][] memo) {
+        // code here
+        if(sum == 0) return 0;
+        if(coinsLength == 0) return -1;
+
+        if(memo[sum][coinsLength] != -2) return memo[sum][coinsLength];
+
+
+        int minCoinsWithout = minCoins(coins, coinsLength-1, sum, memo);
+        int minCoinsWith = -1;
+        if(coins[coinsLength-1] <= sum){
+            minCoinsWith = minCoins(coins, coinsLength, sum-coins[coinsLength-1], memo);
+            if(minCoinsWith != -1) minCoinsWith += 1;
+        }
+
+        int minCoin = -1;
+        if(minCoinsWith != -1 && minCoinsWithout != -1){
+            minCoin = Math.min(minCoinsWith, minCoinsWithout);
+        }else if(minCoinsWithout == -1){
+            minCoin = minCoinsWith;
+        }else{
+            minCoin = minCoinsWithout;
+        }
+
+        memo[sum][coinsLength] = minCoin;
+        return minCoin;
+    }
+
+
+
+    /**
+     *               [100, 180, 260, 310, 40, 535, 695]
+     *
+     *                              root[100, 180, 260, 310, 40, 535, 695]
+     *
+     *  100[180, 260, 310, 40, 535, 695]           [180, 260, 310, 40, 535, 695]
+     *
+     * where n is the lenght of stock prices:
+     *   dp(maxTotal,n) = d(+/-arr[i], n-1) OR d(n-1)
+     *
+     * The base case is when the arrays array is empty {}
+     * We need to
+     *
+     * */
+    // Function to find the days of buying and selling stock for max profit.
+    int stockBuySell(int arr[]) {
+        // code here
+        int arrLength = arr.length;
+
+        int[][] memo = new int[arrLength+1][2];
+        for(int[] row: memo){
+            Arrays.fill(row, -1);
+        }
+        return stockBuySell(arr, 0, true, memo);
+    }
+
+    private int stockBuySell(int[] arr, int buyIndex, boolean toBuy, int[][] memo){
+        if(buyIndex == arr.length) return 0;
+
+        int toBuyNum = toBuy? 1 : 0;
+        if(memo[buyIndex][toBuyNum] != -1) return memo[buyIndex][toBuyNum];
+
+        int withoutStock = stockBuySell(arr, buyIndex+1, toBuy, memo);
+
+        int withStock = stockBuySell(arr, buyIndex+1, !toBuy, memo);
+        withStock += toBuy? -1 * arr[buyIndex] : arr[buyIndex];
+
+
+        memo[buyIndex][toBuyNum] = Math.max(withoutStock, withStock);
+        return memo[buyIndex][toBuyNum];
     }
 }
