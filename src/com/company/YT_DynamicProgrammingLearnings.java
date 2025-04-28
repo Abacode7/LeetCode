@@ -1125,14 +1125,14 @@ public class YT_DynamicProgrammingLearnings {
      *
      *
      *
-     *      Patterns
-     *      Multi-selection, infinite
+     *      KEY: DP PATTERNS
+     *      Arrangement, Infinite
      *      dp(target) = dp(target-arr[0]) OR...OR dp(target-arr[n-1])
      *
-     *      Selection, infinite
+     *      Selection, Infinite
      *      dp(target, n) = dp(target, n-1) OR dp(target-arr[n-1], n)
      *
-     *      Selection, not infinite
+     *      Selection, Finite
      *      dp(target, n) = dp(target, n-1) OR dp(target-arr[n-1], n-1)
      *
      *

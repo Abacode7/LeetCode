@@ -35,6 +35,8 @@ public class GFG_DynamicProgrammingProblems {
      *
      *
      * dp(W, n) = dp(W, n-1) OR dp(W-arr[n-1], n-1)
+     *
+     * Tag: Selection, Finite
      */
 
     static int knapsack(int W, int val[], int wt[]) {
@@ -149,6 +151,9 @@ public class GFG_DynamicProgrammingProblems {
      *              11
      *     10(-1) 6(-5) 0(-11) 6(-5)
      *
+     *    dp(target,n) = dp(target,n-1) OR dp(target-arr[n-1],n-1)
+     *
+     * Tag: Selection, Finite
      * */
     static boolean equalPartition(int arr[]) {
         // code here
@@ -200,7 +205,7 @@ public class GFG_DynamicProgrammingProblems {
 
     /**
      * This allows for Selection, which comes with infinite supply.
-     *
+     * Tag: Selection, Infinite
      */
     public int countCoinChange(int coins[], int sum) {
         // code here.
@@ -244,6 +249,8 @@ public class GFG_DynamicProgrammingProblems {
      *      * [0...n-1] where n is the lenght of coins
      *      *
      *      * dp(sum,n) = dp(sum,n-1) OR dp(sum-arr[n-1], n)
+     *
+     *      Tag: Selection, Infinite
      * */
     public int minCoins(int coins[], int sum) {
         // code here
@@ -284,6 +291,8 @@ public class GFG_DynamicProgrammingProblems {
 
 
 
+
+
     /**
      *               [100, 180, 260, 310, 40, 535, 695]
      *
@@ -295,8 +304,14 @@ public class GFG_DynamicProgrammingProblems {
      *   dp(maxTotal,n) = d(+/-arr[i], n-1) OR d(n-1)
      *
      * The base case is when the arrays array is empty {}
-     * We need to
+     * We need to explore all paths, and at each problem we might either BUY/SELL a stock or IGNORE it
      *
+     * We start from the front, given we must buy first before we sell.
+     * At each point, we choose to buy/sell OR ignore.
+     *      If we buy, the subproblem that follows it says sell
+     *      If we ignore, the subproblem that follows that still holds on to the command (to buy in this case)
+     *
+     * Tag: Selection, Finite
      * */
     // Function to find the days of buying and selling stock for max profit.
     int stockBuySell(int arr[]) {
@@ -316,6 +331,7 @@ public class GFG_DynamicProgrammingProblems {
         int toBuyNum = toBuy? 1 : 0;
         if(memo[buyIndex][toBuyNum] != -1) return memo[buyIndex][toBuyNum];
 
+
         int withoutStock = stockBuySell(arr, buyIndex+1, toBuy, memo);
 
         int withStock = stockBuySell(arr, buyIndex+1, !toBuy, memo);
@@ -324,5 +340,49 @@ public class GFG_DynamicProgrammingProblems {
 
         memo[buyIndex][toBuyNum] = Math.max(withoutStock, withStock);
         return memo[buyIndex][toBuyNum];
+    }
+
+
+
+
+
+    /**
+     *  AAP | ACT => ACTAAP
+     *  Every last (or first) character in the bigger string must equal the last char in one of the smaller strings
+     *         In such cases we
+     *  The case where we might have last char equal to the last char of both string1 and string2 then we need to explore
+     *  both paths
+     *
+     *  The base case is if the bigger string is exhausted, since s1 + s2 = s3 then it means we've fully exhausted s1 and s2
+     *
+     *  NB: Check for indexes as you process them
+     * */
+    public boolean isInterLeave(String s1, String s2, String s3) {
+        // code here
+        if(s1.length() + s2.length() != s3.length()) return false;
+
+        int[][] memo = new int[s1.length()+1][s2.length()+1];
+
+        for(int[] row: memo) Arrays.fill(row, -1);
+
+        return isInterLeave(s1, s2, s3, s1.length(), s2.length(), s3.length(), memo);
+    }
+
+    private boolean isInterLeave(String s1, String s2, String s3, int m, int n, int k, int[][] memo){
+        if(k == 0) return true;
+        if(memo[m][n] != -1) return memo[m][n] == 1;
+
+        boolean isInterLeaved = false;
+        if((m > 0 && s3.charAt(k-1) == s1.charAt(m-1)) &&
+                (n > 0 && s3.charAt(k-1) == s2.charAt(n-1))){
+            isInterLeaved = isInterLeave(s1, s2, s3, m-1, n, k-1, memo) || isInterLeave(s1, s2, s3, m, n-1, k-1, memo);
+        }else if(m > 0 && s3.charAt(k-1) == s1.charAt(m-1)){
+            isInterLeaved = isInterLeave(s1, s2, s3, m-1, n, k-1, memo);
+        }else if(n > 0 && s3.charAt(k-1) == s2.charAt(n-1)){
+            isInterLeaved = isInterLeave(s1, s2, s3, m, n-1, k-1, memo);
+        }
+
+        memo[m][n] = isInterLeaved ? 1 : 0;
+        return isInterLeaved;
     }
 }
