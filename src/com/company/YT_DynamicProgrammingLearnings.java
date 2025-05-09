@@ -1139,6 +1139,14 @@ public class YT_DynamicProgrammingLearnings {
      *      NB: The base case depends on whether you're focusing on returning values of the edges
      *      or a base value at the leaf node.
      *
+     *      For example:
+     *      Base: The problem might ask you to affirm if a path to the base case exists.
+     *      In this case can return true (for boolean) or 1 (for integer count) if we get to the ideal base case.
+     *      Or return false or 0 if not.
+     *
+     *      Edge: In other cases, the problem might ask you to do something with the path edges downwards.
+     *      In this you might save the edges or sum them or whatever, but the focus is the edges.
+     *
      */
 
 

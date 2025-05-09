@@ -233,6 +233,7 @@ public class GFG_DynamicProgrammingProblems {
 
 
 
+
     /**
      * coins [25, 10, 5], sum = 30
      *
@@ -385,4 +386,59 @@ public class GFG_DynamicProgrammingProblems {
         memo[m][n] = isInterLeaved ? 1 : 0;
         return isInterLeaved;
     }
+
+
+
+
+    /**
+     *  Given: ABCDE and ABE
+     *
+     * LCS(ABCDE, ABE) = 1 + LCS(ABCD, AB)
+     *
+     * LCS(ABCD, AB) = LCS(ABC, AB) OR LCS(ABCD, AB)
+     *
+     * if s1[i] == s2[j]: 1 + LCS(s1[m-1], s2[n-1])
+     * else: LCS(s1[m-1], s2[n]) OR LCS(s1[m], s2[n-1])
+     *
+     * */
+    static int lcs(String s1, String s2) {
+        // code here
+        int s1Length = s1.length();
+        int s2Length = s2.length();
+
+        int[][] memo = new int[s1Length+1][s2Length+1];
+        for(int[] row: memo){
+            Arrays.fill(row, -1);
+        }
+
+        return lcs(s1, s2, s1Length, s2Length, memo);
+    }
+
+    private static int lcs(String s1, String s2, int s1Length, int s2Length, int[][] memo){
+        if(s1Length == 0 || s2Length == 0) return 0;
+
+        if(memo[s1Length][s2Length] != -1) return memo[s1Length][s2Length];
+
+        int lcsValue = 0;
+        if(s1.charAt(s1Length-1) == s2.charAt(s2Length-1)){
+            lcsValue = 1 + lcs(s1, s2, s1Length-1, s2Length-1, memo);
+        }else{
+            lcsValue = Math.max(lcs(s1, s2, s1Length, s2Length-1, memo), lcs(s1, s2, s1Length-1, s2Length, memo));
+        }
+
+        memo[s1Length][s2Length] = lcsValue;
+        return lcsValue;
+    }
+
+
+    /**
+     * Given and arr A with size n, we want to create a new array B by removing n/3 elements from A.
+     * We want to get the maximum value possible from B if we say sum of first half of B - sum of second half of B,
+     * without changing the order of items in A and B.
+     *
+     * Given: 1, 3, 4, 7, 5, 2
+     * a solution is removing 1 and 3, so we have (4 + 7) - (5+2) = 4 as the answer.
+     */
+
+
 }
