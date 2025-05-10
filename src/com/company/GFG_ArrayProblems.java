@@ -9,6 +9,19 @@ public class GFG_ArrayProblems {
         System.out.println(matSearch(input, 4));
 
         System.out.println(least_average2(new int[]{30, 20, 10}, 1));
+
+        System.out.println(hasTripletSum(new int[]{84, 24, 14, 97, 93, 92, 83}, 181));
+
+
+        int[] inputArray = new int[]{1, 2, 3, 4, 5};
+        System.out.println("Input Array: " + Arrays.toString(inputArray));
+
+        leftRotateArray(inputArray, 2);
+        System.out.println("Left Rotate: " + Arrays.toString(inputArray));
+
+        int[] inputArray2 = new int[]{1, 2, 3, 4, 5};
+        rightRotateArray(inputArray2, 2);
+        System.out.println("Right Rotate: " + Arrays.toString(inputArray2));
     }
 
     /**
@@ -89,6 +102,130 @@ public class GFG_ArrayProblems {
         return false;
     }
 
+
+
+    /**
+     * Left Array Rotation Using Reversal
+     * 1, 2, 3, 4, 5 | n elements
+     * 0  1. 2. 3. 4 |  4 3 2 1 0
+     *
+     * 2  3. 4. 0. 1
+     *
+     * Note:
+     * n elements = first d elements & (n-d) elements
+     * n = d & (n-d)
+     * rotated n = (n-d) & d
+     *
+     * Also Note:
+     * If d >= n: rotation by d = rotation by d % n
+     * For example 6 % 5 => 1, rotation by 1 == rotation by 6
+     *
+     * Using New Temp Array:
+     * - Iterate from d...<n in arr:
+     *      new_array[i-d] = arr[i]
+     *
+     * - Iterate from 0...<d in arr:
+     *      new_array[n-d + i] = arr[i]
+     *
+     *
+     * Using Reversal In Place:
+     * How can I take: 0  1. 2. 3. 4  => 2  3. 4. 0. 1
+     * Knowing n = d & (n-d)
+     * Reverse 0...<n: 4 3 2 1 0
+     * Reverse 0...<(n-d): 2 3 4 1 0
+     * Reverse n-d...<n: 2 3 4 0 1
+     *
+     * */
+    static void leftRotateArray(int arr[], int d) {
+        // add your code here
+        if(arr == null || arr.length == 0) return;
+        int arrLength = arr.length;
+
+        d = d % arrLength;
+
+        reverseArray(arr, 0, arrLength-1);
+        reverseArray(arr, 0, arrLength-d-1);
+        reverseArray(arr, arrLength-d, arrLength-1);
+    }
+
+    static void reverseArray(int[] arr, int startIndex, int endIndex){
+        int arrLength = arr.length;
+        if(!isValidIndex(startIndex, arrLength)) return;
+        if(!isValidIndex(endIndex, arrLength)) return;
+
+        while(startIndex < endIndex){
+            int temp = arr[startIndex];
+            arr[startIndex] = arr[endIndex];
+            arr[endIndex] = temp;
+
+            startIndex++;
+            endIndex--;
+        }
+    }
+
+    static boolean isValidIndex(int index, int arrLength){
+        return index >= 0 && index < arrLength;
+    }
+
+    /**
+     * Left Array Rotation (Using Modulo)
+     * 1, 2, 3, 4, 5
+     * ---------------
+     * 0  1. 2. 3. 4
+     *
+     * 2  3. 4. 0. 1
+     *
+     * i = 0, iprime = 2
+     * i = 1, iprime = 3
+     * ....
+     * Say n is array length
+     * d = 2, n = 5
+     * iprime = (i + d) % n
+     *
+     * i = 0: (0 + 2) % 5 = 2
+     * i = 3: (3 + 2) % 5 = 0
+     * i = 4: (4 + 2) % 5 = 1
+     *
+     * arr[iprime] = a[(i + d) % n]
+     * */
+    static void leftRotateArray1(int arr[], int d) {
+        // add your code here
+        int arrLength = arr.length;
+        int[] result = new int[arrLength];
+
+        for(int i=0; i<arrLength; i++){
+            result[i] = arr[(i + d) % arrLength];
+        }
+
+        for(int i=0; i<arrLength; i++){
+            arr[i] = result[i];
+        }
+    }
+
+    /**
+     * Right Array Rotation (Using Reversal)
+     * 1 2 3 4 5 where d = 2
+     * 0 1 2 3 4
+     * Index becomes:
+     * 3 4 0 1 2
+     *
+     * n = (n-d) & d
+     * n = [0...n-d-1] & [n-d...n-1]
+     *
+     * Reverse 0...n-1: 4 3 2 1 0
+     * Reverse 0...d-1: 3 4 2 1 0
+     * Reverse d...n-1: 3 4 0 1 2
+     */
+    static void rightRotateArray(int[] arr, int d){
+        if(arr == null || arr.length == 0) return;
+        int arrLength = arr.length;
+
+        d = d % arrLength;
+
+        reverseArray(arr, 0, arrLength-1);
+        reverseArray(arr, 0, d-1);
+        reverseArray(arr, d, arrLength-1);
+    }
 
 
     /**
@@ -329,5 +466,131 @@ public class GFG_ArrayProblems {
 
             i += 2;
         }
+    }
+
+
+
+
+    /**
+     * Duplicates in Array
+     *
+     * 0 1 2 1 500 | [0 1 2 500]
+     * [0.....500]
+     *
+     * Solution: Using Set to store present numbers
+     *      Time: O(n)
+     *      Space: O(n)
+     * */
+    public List<Integer> findDuplicates(int[] arr) {
+        // code here
+        List<Integer> duplicates = new ArrayList<>();
+
+        if(arr == null || arr.length == 0) return duplicates;
+
+        Set<Integer> set = new HashSet<>();
+
+        for(int number: arr){
+            if(set.contains(number)){
+                duplicates.add(number);
+            }
+            set.add(number);
+        }
+        return duplicates;
+    }
+
+
+
+
+    /**
+     * Has Triplet Sum
+     * Solution: Perform Two sum on each index
+     *  Time: O(n^2)
+     *  Space: O(n)
+     */
+    public static boolean hasTripletSum2(int[] arr, int target) {
+        // Your code Here
+        if(arr == null || arr.length < 3) return false;
+
+        for(int i=0; i<arr.length-2; i++){
+            int newTarget = target - arr[i];
+
+            boolean hasTwoSum = hasTwoSum(arr, i+1, newTarget);
+            if(hasTwoSum) return true;
+        }
+        return false;
+    }
+
+    private static boolean hasTwoSum(int[] arr, int startIndex, int target){
+        Set<Integer> set = new HashSet<>();
+
+        for(int i=startIndex; i < arr.length; i++){
+            if(set.contains(target - arr[i])) return true;
+
+            set.add(arr[i]);
+        }
+        return false;
+    }
+
+    /**
+     * Has Triplet Sum
+     * - Each element either:
+     *      - Contributes to a triplet that yields the target
+     *      - Doesn't contribute to a triplet that yields the target
+     *
+     * [1, 4, 45, 6, 10, 8], target = 13
+     * target,numberOfElements,elementsUsed
+     *
+     *                         13,6,0
+     *           5,5,1                        13,5,0
+     *           5,4,1
+     *           5,3,1
+     *           5,2,1
+     *
+     *  1,1,2       5,1,1
+     *
+     * 0,0,3        4,0,2
+     *
+     * Positive
+     * - Target is 0 & Element used is 3
+     * Negative
+     * - Number of elements is 0
+     *
+     * Solution: Using Divide & Conquer (without memoization)
+     *      Time (without DP): O(2^n)
+     *      Space: O(n), which is the recursive call stack
+     *
+     * Solution Improved: Using Dynamic Programming
+     *      Time: O(n), we process all children of the left-most subtree which is 2 * n = 2n
+     *      Space: O(n), where n is recursive stack and 2n for all sub problems in the memo
+     *
+     * */
+    public static boolean hasTripletSum(int[] arr, int target) {
+        // Your code Here
+        if(arr == null || arr.length < 3) return false;
+
+        Map<String, Boolean> memo = new HashMap<>();
+
+        int arrLength = arr.length;
+        return hasTripletSum(arr, arrLength, 0, target, memo);
+    }
+
+    private static boolean hasTripletSum(int[] arr, int arrLength, int elementsUsed, int target, Map<String, Boolean> memo){
+        if(target == 0 && elementsUsed == 3) return true;
+        if(arrLength == 0 || elementsUsed > 3) return false;
+
+        String memoKey = target + "-" + arrLength + "-" + elementsUsed;
+        if(memo.containsKey(memoKey)) return memo.get(memoKey);
+
+        boolean hasTripletSumWithoutLastElement = hasTripletSum(arr, arrLength-1, elementsUsed, target, memo);
+        // Todo: We can short circuit here
+
+        boolean hasTripletSumWithLastElement = false;
+        if(arr[arrLength-1] <= target){
+            hasTripletSumWithLastElement = hasTripletSum(arr, arrLength-1, elementsUsed+1, target-arr[arrLength-1], memo);
+        }
+
+        boolean hasTripletSum = hasTripletSumWithoutLastElement || hasTripletSumWithLastElement;
+        memo.put(memoKey, hasTripletSum);
+        return hasTripletSum;
     }
 }
