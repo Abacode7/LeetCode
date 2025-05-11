@@ -25,6 +25,14 @@ public class GFG_ArrayProblems {
     }
 
     /**
+     * Revision: Maximum Subarray Sum
+     * Find the:
+     * maxSumSoFar (to currentIndex): Max(maxSumSoFarToPrevIndex + currentValue, currentValue)
+     * globalMax = Max(globalMax, maxSumSoFar)
+     * NB: We're basically comparing all maxSumSoFar to find the globalMaxSum
+     * */
+
+    /**
      * Maximum Subarray Sum - Kadanes Algorithm
      *
      * Given: [2, 3, -8, 7, -1, 2, 3]
@@ -50,6 +58,25 @@ public class GFG_ArrayProblems {
     }
 
 
+
+
+    /**
+     * Revision: Search in a Row-Column sorted matrix
+     * 3   30. 38
+     * 20  52. 54
+     * 35. 60. 69
+     *
+     * NB: There's a property elements at the tip of the minor diagonal have:
+     * - For Top Right:
+     *      - It's value (38) is the largest element in its row & smallest in its column
+     * - For Bottom Left:
+     *      - It's value (35) is the largest element in its column & smallet in its row
+     *
+     * Elements it the major diagonal don't have this property.
+     *
+     * Hence, we reduce the row index OR column index accordingly,
+     * after comparing to the element in the current index.
+     * */
 
     /**
      * Search in a Row-Column sorted matrix
@@ -228,6 +255,23 @@ public class GFG_ArrayProblems {
     }
 
 
+
+    /**
+     * Revision: Spirally traversing a matrix
+     *      l.      r
+     *      1  2    3    4.
+     *      5  6    7    8.  t
+     *      9  10.  11.  12. b
+     *      13 14.  15.  16.
+     *
+     * 1 2 3 4 8 12 16
+     * - Left to Right, Increase Top by 1
+     * - Top to Bottom, Reduce Right by 1
+     * - Right to Left, Reduce Bottom by 1
+     * - Bottom to Top, Increase Left by 1
+     *
+     * */
+
     /**
      * Spirally traversing a matrix
      *
@@ -334,6 +378,45 @@ public class GFG_ArrayProblems {
         return res;
     }
 
+    /**
+     * 3, 0, 1, 0, 4, 0 2
+     *
+     * We don't need to calculate all left & right Maxes
+     *
+     * We just need two pointers to store the leftMost max & rightMost Max
+     * And then we focus on the minimum between the two
+     *
+     * Time: O(n) time
+     * Space: O(1) space
+     * */
+    public int maxWaterOptimized(int arr[]) {
+        // code here - OPTIMAL
+        int n = arr.length;
+        int leftMax = arr[0];
+        int rightMax = arr[n-1];
+
+        int left = 1;
+        int right = n-2;
+
+        int sumOfWater = 0;
+        while(left <= right){
+            if(leftMax <= rightMax){
+                sumOfWater += Math.max(0, leftMax - arr[left]);
+
+                leftMax = Math.max(leftMax, arr[left]);
+
+                left++;
+            }else{
+                sumOfWater += Math.max(0, rightMax - arr[right]);
+
+                rightMax = Math.max(rightMax, arr[right]);
+
+                right--;
+            }
+        }
+        return sumOfWater;
+    }
+
 
 
     /**
@@ -383,7 +466,7 @@ public class GFG_ArrayProblems {
      *
      * Solution: O(n) time, O(1) space - OPTIMAL
      * recent_average = (30 + 20)/2 = 25
-     * min-average = recent_avarage
+     * min-average = recent_average
      * second_average =  ((recent-average * k) - val[i-1] + val[i+k])/k
      * */
     public static int least_average(int[] nums, int k){
@@ -452,7 +535,7 @@ public class GFG_ArrayProblems {
      * 3 7 4 8 6 2 1
      * 3 7 4 8 6 2 1
      * 3 7 4 8 2 6 1
-
+     *
      * */
     public static void zigZag(int[] arr) {
         // code here
@@ -466,6 +549,48 @@ public class GFG_ArrayProblems {
 
             i += 2;
         }
+    }
+
+    /**
+     * 1 2 3 4 5 6
+     * 1 3 2 5 6 4
+     *
+     * 6 5 4 3 2 1
+     * 5 6 3 4 1 2
+     *
+     * Intuition:
+     * This alternates the check from less than to greater than, to decided
+     * when to swap indexes.
+     *
+     * Start from second to last element:
+     *      - If less than: swap
+     *      - Then If greater than: swap
+     *
+     *   Time: O(n) time
+     *   Space: O(1) space
+     * */
+    public static void zigZagOptimized(int[] arr) {
+        // code here - OPTIMAL
+        boolean isLessThan = true;
+        for(int i = 1; i < arr.length; i++){
+            if(isLessOrGreaterThanPrevious(arr, i, isLessThan)){
+                swapWithPrevious(arr, i);
+            }
+            isLessThan = !isLessThan;
+        }
+    }
+
+    private static boolean isLessOrGreaterThanPrevious(int[] arr, int index, boolean isLessThan){
+        if(isLessThan){
+            return arr[index] < arr[index-1];
+        }
+        return arr[index] > arr[index-1];
+    }
+
+    private static void swapWithPrevious(int[] arr, int index){
+        int temp = arr[index];
+        arr[index] = arr[index-1];
+        arr[index-1] = temp;
     }
 
 
