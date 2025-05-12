@@ -412,4 +412,185 @@ public class GFG_StringProblems {
         }
         return maxSubstring;
     }
+
+
+
+    /**
+     * Are Anagrams
+     *
+     * geeks | kseeg
+     * Using Sorting:
+     * Time: O(nlogn + mlogm)
+     * Space: O(n + m)
+     *
+     * Using Sorting Via Fixed Character Array
+     * ASCII | Alphabets | Numbers are Fixed
+     * We can sort them in linear time Using a Fixed Array
+     *
+     * Time: O(n + m)
+     * Space: O(n + m)
+     * */
+    public static boolean areAnagrams(String s1, String s2) {
+        // Your code here
+        if(s1.length() != s2.length()) return false;
+
+        String sortedS1 = sortString(s1);
+        String sortedS2 = sortString(s2);
+
+        return sortedS1.equals(sortedS2);
+    }
+
+    private static String sortString(String word){
+        int[] charCounts = new int[26];
+
+        for(char wordChar: word.toCharArray()){
+            charCounts[wordChar - 'a']++;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i=0; i<26; i++){
+            int charCount = charCounts[i];
+
+            while(charCount > 0){
+                char wordChar = (char) ('a' + i);
+                stringBuilder.append(wordChar);
+                charCount--;
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+
+
+    /**
+     * Look & Say Pattern
+     *
+     * Intuition:
+     * Like the problem statement, you have to look and say the previouse value
+     * to get the next value.
+     *
+     * Complexity
+     * Say the count is n, and the longest word for n is of lenght m, we can say:
+     *      Time: O(n * m)
+     *      Space: O(nm), we allocate m, n times
+     * */
+    public String countAndSay(int n) {
+        // code here
+        String word = "1";
+        for(int i=1; i<n; i++){
+            word = lookAndSay(word);
+        }
+        return word;
+    }
+
+    private String lookAndSay(String word){
+        int wordLength = word.length();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        int i = 0;
+        while(i < wordLength){
+            int charCount = 1;
+            int j = i;
+            while(j < wordLength-1 && word.charAt(j) == word.charAt(j+1)){
+                charCount++;
+                j++;
+            }
+
+            stringBuilder.append(String.valueOf(charCount));
+            stringBuilder.append(word.charAt(i));
+
+            i = j+1;
+        }
+
+        return stringBuilder.toString();
+    }
+
+
+
+    /**
+     * Remove To Form Anagram
+     * c d d g k | g c d, k k, x
+     * c d g k | g c d
+     * 0 1 0 1
+     *
+     * c d g k | k k
+     * 1 2 1 1.  1 1
+     *
+     * Intuition
+     * NB: Removals can be from any/both strings
+     * Goal is to count the letters at each index for both strings
+     * - Remove the excess letters at each index
+     * - Sum of the left overs is what needs to be removed.
+     *
+     * Time: O(n) time
+     * Space: O(1) space
+     *
+     *
+     * */
+    public int remAnagrams(String s1, String s2) {
+        // add code here.
+
+        int[] s1Count = new int[26];
+        int[] s2Count = new int[26];
+
+        for(int i=0; i<s1.length(); i++) s1Count[s1.charAt(i) - 'a']++;
+
+        for(int i=0; i<s2.length(); i++) s2Count[s2.charAt(i) - 'a']++;
+
+        int numOfRemovals = 0;
+        for(int i=0; i<26; i++){
+            numOfRemovals += Math.abs(s1Count[i] - s2Count[i]);
+        }
+
+        return numOfRemovals;
+    }
+
+
+
+
+    /**
+     * Longest Unique Substring
+     *
+     * [abcdef]
+     * i=0
+     * j=0
+     * abcdefabcbb
+     *
+     * Intuiton: Using Two Pointers
+     * - One to add unique values to the set
+     * - The other to track the earliest unique value in the substring
+     *  - If we find a duplicate:
+     *      - Remove earliest unique value
+     *      - Iterate earliest pointer
+     *
+     * NB: Operates like sliding window
+     * Complexity:
+     *      Time: O(n) time
+     *      Space: O(n) space
+     * */
+    public int longestUniqueSubstr(String s) {
+        // code here
+        HashSet<Character> set = new HashSet<>();
+
+        int i = 0;
+        int j = 0;
+
+        int longestSubstringLength = Integer.MIN_VALUE;
+        while(j < s.length()){
+
+            while(j < s.length() && !set.contains(s.charAt(j))){
+                set.add(s.charAt(j));
+                j++;
+            }
+
+            int substringLength = j - i;
+            longestSubstringLength = Math.max(substringLength, longestSubstringLength);
+
+            set.remove(s.charAt(i));
+            i++;
+        }
+        return longestSubstringLength;
+    }
+
 }
