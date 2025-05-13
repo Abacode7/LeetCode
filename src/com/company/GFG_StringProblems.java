@@ -279,6 +279,12 @@ public class GFG_StringProblems {
      *   ABC  ACB    BAC BCA   CBA CAB  - 1 POSITION
      *
      *
+     *                  ABC  - 3 POSITIONS
+     *       ABC        ACB         CBA  - 2 POSITIONS
+     *   ABC   BAC      ACB CAB     CBA  BCA  -  1 POSITION
+     *   NB: This does the same implementation, fixing the positions from the last value
+     *   The code implementation uses this.
+     *
      *   At each level, full length (3 positions), we swap the first position with all positions
      *   Now the first position is fixed, we reduce the length swap across the levels, till we have 1 free position
      *   NOTE:
