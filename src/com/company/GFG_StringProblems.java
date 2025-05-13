@@ -10,6 +10,18 @@ public class GFG_StringProblems {
     /**
      * Validate an IP Address
      *
+     * - Split on \\.
+     * - Parse & validate number between 0 & 255
+     * - Validate leading zeros
+     *      - If number is non-zero, it should have no leading zero
+     *      - If number is zero, same. It should contain only one zero
+     * - Validate no ip starts with zero 0
+     *      NB: The only exception to this condition is 0.0.0.0
+     *      which should be checked and returned early.
+     * */
+    /**
+     * Validate an IP Address
+     *
      * Solution: O(1) time, O(1) space - OPTIMAL
      * Split string and loop over its address ranges
      */
@@ -192,13 +204,7 @@ public class GFG_StringProblems {
      * o n a m a z | right/clockwise rotation
      * a z o n a m | left/anti-clockwise rotation
      *
-     * Solution 1: O(n) time, O(n) space
-     * Rotate s1 left and right:
-     *  Use substring to cut & join at beginning/end based on rotation
-     * Store rotated values in SET
-     * Check if s2 in SET
-     *
-     * Solution 2: O(n) time, O(1) space - OPTIMAL
+     * Solution: O(n) time, O(1) space - OPTIMAL
      * Compare rotated indexes in s1 and s2 for left & right based on:
      *  i == (i + d) % n, where i is index, d is number of shifts and n is length of string
      * */
@@ -230,27 +236,88 @@ public class GFG_StringProblems {
         return rightRotateValid || leftRotateValid;
     }
 
+    /**
+     * Is Rotated (Simpler)
+     *      * amazon | azonam | onamaz
+     *      * Value  |Left Rotate| Right Rotate
+     *
+     * Given s1 is length n & s2 is length m
+     * Solution:
+     *      * Rotate s1 left and right:
+     *      * Use substring to cut & join at beginning/end based on rotation
+     *      * Creating new strings of s1, take n space
+     *
+     * Complexity:
+     *      Time: O(n) time
+     *      Space:O(n) space
+     * */
+    public static boolean isRotatedSimpler(String s1, String s2) {
+        // Your code here
+        if(s1.length() != s2.length()) return false;
+        if(s1.length() <= 2 && !s1.equals(s2)) return false;
+
+
+        int s1Length = s1.length();
+        String s1LeftRotate = s1.substring(2, s1Length) + s1.substring(0, 2);
+
+        if(s1LeftRotate.equals(s2)) return true;
+
+        String s1RightRotate = s1.substring(s1Length-2, s1Length) + s1.substring(0, s1Length-2);
+
+        if(s1RightRotate.equals(s2)) return true;
+
+        return false;
+    }
+
+
 
 
     /**
      * Live breakdown
-     *  A B S G
-     * See: Backtracking
+     *                ABC - 3 POSITIONS
+     *       ABC      BAC      CBA - 2 POSITIONS
+     *   ABC  ACB    BAC BCA   CBA CAB  - 1 POSITION
+     *
+     *
+     *   At each level, full length (3 positions), we swap the first position with all positions
+     *   Now the first position is fixed, we reduce the length swap across the levels, till we have 1 free position
+     *   NOTE:
+     *   We have to back-track the characters in the string, when swap across a single level
+     *
+     *   Complexity: It's arrangement meaning we'll have
      * */
-    public static ArrayList<String> findPermutation(String s) {
+    public ArrayList<String> findPermutation(String s) {
         // Code here
-        // Todo: Add implementation
-        return new ArrayList<>();
+        StringBuilder word = new StringBuilder(s);
+
+        Set<String> wordPermutations = findPermutation(word, s.length());
+        return new ArrayList<>(wordPermutations);
     }
 
-    private static String swap(String s, int i, int j){
-        if(i < 0 || i >= s.length() || j < 0 || j >= s.length()) return "";
-        char[] sChars = s.toCharArray();
-        char temp = sChars[i];
-        sChars[i] = sChars[j];
-        sChars[j] = temp;
-        return new String(sChars);
+    private Set<String> findPermutation(StringBuilder word, int wordLength) {
+        // Code here
+        Set<String> wordPermutations = new HashSet<>();
+        if(wordLength == 1){
+            wordPermutations.add(word.toString());
+            return wordPermutations;
+        }
+
+        int lastLetterIndex = wordLength-1;
+        for(int j=lastLetterIndex; j>=0; j--){
+            swap(word, j, lastLetterIndex);
+            Set<String> localPermutations = findPermutation(word, wordLength-1);
+            wordPermutations.addAll(localPermutations);
+            swap(word, j, lastLetterIndex);
+        }
+        return wordPermutations;
     }
+
+    private void swap(StringBuilder word, int i, int j){
+        char temp = word.charAt(i);
+        word.setCharAt(i, word.charAt(j));
+        word.setCharAt(j, temp);
+    }
+
 
 
 
@@ -471,9 +538,11 @@ public class GFG_StringProblems {
      * to get the next value.
      *
      * Complexity
-     * Say the count is n, and the longest word for n is of lenght m, we can say:
-     *      Time: O(n * m)
-     *      Space: O(nm), we allocate m, n times
+     * Say the count is n, each term at most doubles in size 1 -> 11 -> 21 -> 1211 -> ... n times
+     * The behaviour is tree like, with the height of the tree being n, hence we have:
+     *      Time: O(2^n)
+     *      Space: O(2^n), at each level we use store all values in a string builder which grows the higher we go
+     *      the sum/max of all such space takes 2^n
      * */
     public String countAndSay(int n) {
         // code here
