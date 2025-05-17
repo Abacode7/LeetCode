@@ -12,7 +12,7 @@ public class AE_SpiralTraverse {
         };
 
         List<Integer> result = spiralTraverse(input);
-        Main.printArray(result);
+        //Main.printArray(result);
     }
 
     // Todo: Rework to cover all test cases (8/12)
