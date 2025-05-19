@@ -59,7 +59,7 @@ public class Amazon_OS {
      O(hmn)
      where h is
 
-     Direction: i,j => {-1, 0} {}-1,0 1,0 0,-1 {0,1}
+     Direction: i,j => -1,0 0,1 1,0 -1,0
      **/
 
     public static List<String> searchWordsInBoard(char[][] board, List<String> words){
@@ -149,6 +149,60 @@ public class Amazon_OS {
 
 
 
+    /**
+     * PK SDE II Onsite
+     * Reference:
+     * https://www.reddit.com/r/leetcode/comments/1kcm20w/amazon_sde_ii/
+     *
+     * Question 1:
+     * Given a list of integer ratings, what is the minimum number of ratings you must remove
+     * from the list such that all the remaining ratings are identical?
+     *
+     * def maximum_increasing_ratings(ratings: list[int]) -> int
+     * n = len(ratings) if n == 0: return 0
+     *
+     * [2 1 2 4 1 5 1 4 6 7 4 500]=
+     * 1: 3
+     * 2: 2
+     * 4: 2
+     * 5: 1
+     * 6: 1
+     * 7: 1
+     * 500: 1
+     *
+     * Min Rating Removal = Total Number of Ratings - (Freq of most frequent rating)
+     *
+     * Complexity: O(n) time, O(n) space
+     *
+     * Test Example: [7, 3, 4, 2, 3]
+     * max = 2
+     *
+     * 7: 1
+     * 3: 2
+     * 4: 1
+     * 2: 1
+     */
+    public static int maximumIncreasingRating(int[] ratings){
+        int numOfRatings = ratings.length;
+        if(numOfRatings == 0) return 0;
+
+        Map<Integer, Integer> ratingsFrequency = new HashMap<>();
+        int maxRatingFrequency = Integer.MIN_VALUE;
+
+        for(int rating: ratings){
+            int ratingFrequency = ratingsFrequency.getOrDefault(rating, 0);
+            ratingFrequency++;
+            ratingsFrequency.put(rating, ratingFrequency);
+
+            if(ratingFrequency > maxRatingFrequency) {
+                maxRatingFrequency = ratingFrequency;
+            }
+        }
+
+        return numOfRatings - maxRatingFrequency;
+    }
+
+
 
     /**
      * PK SDE II Onsite
@@ -204,6 +258,24 @@ public class Amazon_OS {
      *               Result = total - 3
      *
      *  Runtime: O(n^2) time, O(n) space
+     *
+     *
+     *  1,2  3,8  4,5  6,7  9,10
+     *
+     *  Intersection Types
+     *  A
+     *  1   3
+     *    2    4
+     *
+     * B
+     *  1      5
+     *    2  4
+     *
+     * C
+     *     2 3
+     *  2      4
+     *
+     * Hence: start1 <= end2 && start2 <= end1
      */
     public static int minRetailersToRelocate(int[] regionStart, int[] regionEnd){
         int regionStartLength = regionStart.length;
@@ -239,63 +311,84 @@ public class Amazon_OS {
     }
 
     private static boolean isRegionIntersect(int regionOneStart, int regionOneEnd, int regionTwoStart, int regionTwoEnd){
-        return !(regionTwoStart > regionOneEnd || regionTwoEnd < regionOneStart);
+        return regionOneStart <= regionTwoEnd && regionTwoStart <= regionOneEnd;
     }
 
+}
 
 
+/**
+ * MinRetailersToRelocate OOP Style
+ */
+class RetailRelocationOptimizer {
 
-    /**
-     * PK SDE II Onsite
-     * Reference:
-     * https://www.reddit.com/r/leetcode/comments/1kcm20w/amazon_sde_ii/
-     *
-     * Question 1:
-     * Given a list of integer ratings, what is the minimum number of ratings you must remove
-     * from the list such that all the remaining ratings are identical?
-     *
-     * def maximum_increasing_ratings(ratings: list[int]) -> int
-     * n = len(ratings) if n == 0: return 0
-     *
-     * [2 1 2 4 1 5 1 4 6 7 4 500]=
-     * 1: 3
-     * 2: 2
-     * 4: 2
-     * 5: 1
-     * 6: 1
-     * 7: 1
-     * 500: 1
-     *
-     * Min Rating Removal = Total Number of Ratings - (Freq of most frequent rating)
-     *
-     * Complexity: O(n) time, O(n) space
-     *
-     * Test Example: [7, 3, 4, 2, 3]
-     * max = 2
-     *
-     * 7: 1
-     * 3: 2
-     * 4: 1
-     * 2: 1
-     */
-    public static int maximumIncreasingRating(int[] ratings){
-        int numOfRatings = ratings.length;
-        if(numOfRatings == 0) return 0;
+    private List<Region> regions;
 
-        Map<Integer, Integer> ratingsFrequency = new HashMap<>();
-        int maxRatingFrequency = Integer.MIN_VALUE;
+    public RetailRelocationOptimizer(List<Region> regions){
+        this.regions = regions;
+    }
 
-        for(int rating: ratings){
-            int ratingFrequency = ratingsFrequency.getOrDefault(rating, 0);
-            ratingFrequency++;
-            ratingsFrequency.put(rating, ratingFrequency);
+    public int minRegionsToRelocation(){
+        if(regions == null || regions.isEmpty()) return 0;
 
-            if(ratingFrequency > maxRatingFrequency) {
-                maxRatingFrequency = ratingFrequency;
+        int numOfRegions = regions.size();
+
+        int[] regionIntersectionCount = new int[numOfRegions];
+        int maxIntersection = Integer.MIN_VALUE;
+
+        for(int i=0; i<numOfRegions-1; i++){
+            for(int j=i+1; j<numOfRegions; j++){
+                Region regionOne = regions.get(i);
+                Region regionTwo = regions.get(j);
+
+                if(doRegionsIntersect(regionOne, regionTwo)){
+                    regionIntersectionCount[i]++;
+                    regionIntersectionCount[j]++;
+                }
+
+                if(regionIntersectionCount[i] > maxIntersection){
+                    maxIntersection = regionIntersectionCount[i];
+                }
+
+                if(regionIntersectionCount[j] > maxIntersection){
+                    maxIntersection = regionIntersectionCount[j];
+                }
             }
         }
 
-        return numOfRatings - maxRatingFrequency;
+        int totalRegionInMaxIntersection = maxIntersection + 1;
+
+        return numOfRegions - totalRegionInMaxIntersection;
     }
 
+    private boolean doRegionsIntersect(Region regionOne, Region regionTwo){
+        return regionOne.getStart() <= regionTwo.getEnd() && regionTwo.getStart() <= regionOne.getEnd();
+    }
+
+    private void sortRegions(){
+        regions.sort(Comparator.comparingInt(Region::getStart));
+    }
+}
+
+
+class Region implements Comparable<Region>{
+    private int start;
+    private int end;
+
+    public Region(int start, int end){
+        if(start >= end){
+            throw new IllegalArgumentException("Region start must be less than region end");
+        }
+
+        this.start = start;
+        this.end = end;
+    }
+
+    public int getStart(){return start;}
+
+    public int getEnd(){return end;}
+
+    public int compareTo(Region otherRegion){
+        return Integer.compare(start, otherRegion.getStart());
+    }
 }
