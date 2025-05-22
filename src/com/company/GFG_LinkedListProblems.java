@@ -1,24 +1,15 @@
 package com.company;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GFG_LinkedListProblems {
 
     public static void main(String[] args){
         // Todo: test implementation
-        System.out.println();
-    }
-
-
-
-    /** Linked List Node Structure */
-    class Node {
-        int data;
-        Node next;
-        Node(int value) {
-            this.data = value;
-        }
+        Node node = new Node(5);
+        System.out.println(node.getClass());
     }
 
 
@@ -191,4 +182,91 @@ public class GFG_LinkedListProblems {
             current = current.next;
         }
     }
+
+
+
+    /**
+     * Given;
+     * [1->3, 2->4, 5->6]
+     *
+     * Find min head and its index:
+     *  headRef -> minHead(1)
+     * Store minHead.next at its index
+     *
+     *  0.  1.   2
+     * [null, null, 5 -> 6]
+     *
+     * headRef -> 1 -> 2 -> 3 -> 4 -> 5 -> 6
+     * At index 0: node = node.next
+     *
+     * */
+    Node mergeKLists(List<Node> arr) {
+        // Add your code here.
+        return LinkedListUtils.mergeKSortedList(arr);
+    }
+
 }
+
+
+/** Linked List Node Structure */
+class Node {
+    int data;
+    Node next;
+
+    public Node(int value) {
+        this.data = value;
+    }
+
+    public int getData(){
+        return data;
+    }
+
+    public Node getNext(){
+        return next;
+    }
+
+    public void setNext(Node next){
+        this.next = next;
+    }
+}
+
+
+
+class LinkedListUtils {
+
+    public static Node mergeKSortedList(List<Node> nodeList) {
+        if(nodeList == null || nodeList.isEmpty()) return null;
+
+        int nodeListSize = nodeList.size();
+
+        Node head = new Node(-1);
+        Node headRef = head;
+
+        while(true){
+            Node minNode = null;
+            int minNodeIndex = -1;
+
+            for(int i=0; i<nodeListSize; i++){
+                Node currentNode = nodeList.get(i);
+
+                if(currentNode == null) continue;
+
+                if(minNode == null || minNode.getData() > currentNode.getData()){
+                    minNode = currentNode;
+                    minNodeIndex = i;
+                }
+            }
+
+            if(minNode == null) break;
+
+            head.setNext(minNode);
+            nodeList.set(minNodeIndex, minNode.getNext());
+
+            head = head.getNext();
+        }
+
+        return headRef.getNext();
+    }
+
+}
+
