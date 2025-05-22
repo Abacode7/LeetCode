@@ -20,14 +20,14 @@ class BrowserHistory {
 
      Tags: Doubly Linked List
      **/
-    private Node currentPage;
+    private BNode currentPage;
 
     public BrowserHistory(String homepage) {
-        this.currentPage = new Node(homepage);
+        this.currentPage = new BNode(homepage);
     }
 
     public void visit(String url) {
-        Node nextPage = new Node(url);
+        BNode nextPage = new BNode(url);
         nextPage.prev = currentPage;
         if(currentPage != null){
             currentPage.next = nextPage;
@@ -55,12 +55,12 @@ class BrowserHistory {
     }
 }
 
-class Node {
+class BNode {
     String value;
-    Node prev;
-    Node next;
+    BNode prev;
+    BNode next;
 
-    public Node(String value){
+    public BNode(String value){
         this.value = value;
     }
 }
