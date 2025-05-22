@@ -11,6 +11,18 @@ public class GFG_LinkedListProblems {
     }
 
 
+
+    /** Linked List Node Structure */
+    class Node {
+        int data;
+        Node next;
+        Node(int value) {
+            this.data = value;
+        }
+    }
+
+
+
     /**
      * Iterate through each nodes
      * Solution 1: O(n) time, O(n) new space
@@ -85,9 +97,9 @@ public class GFG_LinkedListProblems {
             head = head.next;
         }
 
-        if(oddRef != null) oddRef.next = null;
+        oddRef.next = null;
 
-        if(evenRef != null) evenRef.next = oddHead.next;
+        evenRef.next = oddHead.next;
 
         return evenHead.next;
     }
@@ -117,14 +129,6 @@ public class GFG_LinkedListProblems {
         return false;
     }
 
-    class Node {
-        int data;
-        Node next;
-        Node(int value) {
-            this.data = value;
-        }
-    }
-
 
 
     /**
@@ -152,11 +156,10 @@ public class GFG_LinkedListProblems {
                 }else{
                     prev.next = head.next;
                 }
-                head = head.next;
             }else{
                 prev = head;
-                head = head.next;
             }
+            head = head.next;
         }
         return headRef;
     }
