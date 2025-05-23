@@ -13,17 +13,31 @@ public class GFG_StackProblems {
         stack.add(2);
         stack.add(1);
 
+        Stack<Integer> stack3 = new Stack<>();
+        stack3.add(5);
+        stack3.add(4);
+        stack3.add(3);
+        stack3.add(2);
+        stack3.add(1);
+
         Stack<Integer> result = sortStack(stack);
-        Stack<Integer> result1 = sortStack2(stack);
+        Stack<Integer> result2 = sortStack2(stack);
+        Stack<Integer> result3 = sortStack3(stack3);
 
         while(!result.isEmpty()){
             System.out.println(result.pop());
         }
-        System.out.println();
+        System.out.println("Sort Stack 1 Above");
 
-        while(!result1.isEmpty()){
-            System.out.println(result1.pop());
+        while(!result2.isEmpty()){
+            System.out.println(result2.pop());
         }
+        System.out.println("Sort Stack 2 Above");
+
+        while(!result3.isEmpty()){
+            System.out.println(result3.pop());
+        }
+        System.out.println("Sort Stack 3 Above");
 
         /**
          * Test next large element
@@ -64,7 +78,7 @@ public class GFG_StackProblems {
      * Using Stacks to store pairs
      */
     public static boolean validParenthesis(String s){
-        if(Objects.isNull(s) || s.equals("") || s.length() % 2 != 0) return false;
+        if(Objects.isNull(s) || s.isEmpty() || s.length() % 2 != 0) return false;
         Stack<Character> stack = new Stack<>();
         for(char currentChar: s.toCharArray()){
             if(currentChar == '[' || currentChar == '{' || currentChar == '('){
@@ -82,11 +96,16 @@ public class GFG_StackProblems {
 
 
     /**
-     * Solution: O(nlogn) time, O(n) space
      * With sort method
+     * Solution: O(nlogn) time, O(n) space
      *
-     * Solution 2: O(n^2) time, O(n) space
+     *
      * Without sort method
+     * Solution 2: Using Arrays
+     * O(n^2) time, O(n) space
+     *
+     * Solution 3: Using Priority Queue
+     * O(nlogn) time, O(n) space
      * */
     public static Stack<Integer> sortStack(Stack<Integer> s) {
         // add code here.
@@ -127,6 +146,23 @@ public class GFG_StackProblems {
         return s;
     }
 
+    public static Stack<Integer> sortStack3(Stack<Integer> s) {
+        // add code here.
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        while(!s.isEmpty()){
+            int value = s.pop();
+            minHeap.offer(value);
+        }
+
+        while(!minHeap.isEmpty()){
+            int value = minHeap.poll();
+            s.push(value);
+        }
+
+        return s;
+    }
+
 
 
     /**
@@ -137,9 +173,9 @@ public class GFG_StackProblems {
      *  2   0 1 1
      *
      * Steps
-     * Find the suspect celebrity: Person who knows no one
-     * If suspect != 1: Then no celeb, return -1
-     * else: check that every one knows suspect celeb
+     * - Find the suspect celebrity: Person who knows no one
+     * - If suspect != 1: Then no celeb, return -1
+     * - else: check that every one knows suspect celeb
      *
      * Solution: O(n^2) time, O(1) space
      * Iterating the adjacency matrix
@@ -147,11 +183,13 @@ public class GFG_StackProblems {
      * Solution 2: O(n) time, O(1) space
      * Using two pointers
      * i = 0, j = n-1
+     * - First Step
      * if i knows j:
      *  then i isn't a celeb, j may be  a celeb, increment i
      * else:
      *  j isn't a celeb, i may be a celeb, decrement j
      *
+     * - Second Step
      *  Get the potential celeb
      *  Then check if potential celeb is celeb
      * */
@@ -217,6 +255,16 @@ public class GFG_StackProblems {
      *
      * Solution 1: O(n) `amortized` time, O(n) space
      * Using stack to store and delete next large elements
+     *
+     *      *                    Stack
+     *      * 1, 3, 2, 4.        3 (2)4]  2 delete, for value 3
+     *      * 3. 4. 4. -1
+     *      *
+     *
+     *      * - delete till you find element > current value
+     *      *      - if stack is empty: result is -1
+     *      *      - if element found: result is element> for that index
+     *
      * */
     public static ArrayList<Integer> nextLargerElement(int[] arr) {
         // code here
