@@ -8,8 +8,19 @@ public class GFG_LinkedListProblems {
 
     public static void main(String[] args){
         // Todo: test implementation
-        Node node = new Node(5);
-        System.out.println(node.getClass());
+        LinkedListUtils.Node node =
+                new LinkedListUtils.Node(4,
+                new LinkedListUtils.Node(2,
+                        new LinkedListUtils.Node(1), new LinkedListUtils.Node(3)),
+                new LinkedListUtils.Node(5));
+
+        System.out.println("Before Flatten: ");
+        LinkedListUtils.printNodes(node);
+        System.out.println();
+
+        LinkedListUtils.flatten(node);
+        System.out.println("After Flatten: ");
+        LinkedListUtils.printNodes(node);
     }
 
 
@@ -185,6 +196,46 @@ public class GFG_LinkedListProblems {
 
 
 
+
+    /**
+     * Given:
+      s.   f
+      1.   null
+     * 1    2   3   4   5  null
+     * 3rd from the end
+     *
+     * counter = 1 to <=k
+     *
+     * edge cases:
+     * - head is null OR k < 0: return -1
+     *
+     * Solution: Two Pointers (fast & slow)
+     *      Time: O(n) time
+     *      Space: O(1) space
+     * */
+    int getKthFromLast(Node head, int k) {
+        // Your code here
+        if(head == null || k <= 0) return -1;
+
+        Node fast = head;
+        int fastCounter = 1;
+        while(fastCounter <= k){
+            if(fast == null) return -1; // If fast is null before we get to k, return -1;
+
+            fast = fast.next;
+            fastCounter++;
+        }
+
+        Node slow = head;
+        while(fast != null){
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow.data;
+    }
+
+
+
     /**
      * Given;
      * [1->3, 2->4, 5->6]
@@ -200,41 +251,7 @@ public class GFG_LinkedListProblems {
      * At index 0: node = node.next
      *
      * */
-    Node mergeKLists(List<Node> arr) {
-        // Add your code here.
-        return LinkedListUtils.mergeKSortedList(arr);
-    }
-
-}
-
-
-/** Linked List Node Structure */
-class Node {
-    int data;
-    Node next;
-
-    public Node(int value) {
-        this.data = value;
-    }
-
-    public int getData(){
-        return data;
-    }
-
-    public Node getNext(){
-        return next;
-    }
-
-    public void setNext(Node next){
-        this.next = next;
-    }
-}
-
-
-
-class LinkedListUtils {
-
-    public static Node mergeKSortedList(List<Node> nodeList) {
+    static Node mergeKSortedList(List<Node> nodeList) {
         if(nodeList == null || nodeList.isEmpty()) return null;
 
         int nodeListSize = nodeList.size();
@@ -266,6 +283,146 @@ class LinkedListUtils {
         }
 
         return headRef.getNext();
+    }
+
+
+
+
+    /**
+     * Example:
+          4
+        /   \
+       2     5
+     1  3
+     Result: 4 2 1 3  5
+
+     4
+      \
+       2
+        1
+         3
+     * */
+    static void flatten(LinkedListUtils.Node node){
+        LinkedListUtils.flatten(node);
+    }
+
+}
+
+
+/** Linked List Node Structure */
+class Node {
+    int data;
+    Node next;
+
+    public Node(int value) {
+        this.data = value;
+    }
+
+    public int getData(){
+        return data;
+    }
+
+    public Node getNext(){
+        return next;
+    }
+
+    public void setNext(Node next){
+        this.next = next;
+    }
+}
+
+
+
+class LinkedListUtils {
+    /**
+     * Example:
+          4
+        /   \
+       2     5
+     1  3
+     Preorder Traverse: 4 2 1 3  5
+
+     Result
+      4
+       \
+        2
+         1
+          3
+     * */
+    public static void flatten(Node node){
+        if(node == null) return;
+        traverseAndFlatten(node);
+    }
+
+    private static void traverseAndFlatten(Node node){
+        if(node.getLeft() == null && node.getRight() == null) return;
+
+        Node left = node.getLeft();
+        Node right = node.getRight();
+
+        if(left != null){
+            traverseAndFlatten(left);
+
+            Node leftRightMostNode = left;
+            while(leftRightMostNode.getRight() != null){
+                leftRightMostNode = leftRightMostNode.getRight();
+            }
+
+            node.setRight(left);
+            node.setLeft(null);
+            leftRightMostNode.setRight(right);
+        }
+
+        if(right != null) traverseAndFlatten(right);
+    }
+
+    static class Node {
+        private int data;
+        private Node left;
+        private Node right;
+
+        public Node(int data){
+            this.data = data;
+        }
+
+        public Node(int data, Node left, Node right){
+            this.data = data;
+            this.left = left;
+            this.right = right;
+        }
+
+        public int getData(){
+            return data;
+        }
+
+        public Node getLeft(){
+            return left;
+        }
+
+        public Node getRight(){
+            return right;
+        }
+
+        public void setLeft(Node left){
+            this.left = null;
+        }
+
+        public void setRight(Node right){
+            this.right = right;
+        }
+    }
+
+
+    /** Function to print nodes in structure **/
+    public static void printNodes(Node node){
+        if(node == null){
+            System.out.print(" null ");
+            return;
+        }
+
+        System.out.print(node.getData() + " -> ");
+        printNodes(node.left);
+        printNodes(node.right);
     }
 
 }
