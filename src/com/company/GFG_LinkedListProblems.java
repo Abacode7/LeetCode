@@ -55,13 +55,14 @@ public class GFG_LinkedListProblems {
         // code here - OPTIMAL
         if(head == null) return head;
 
-        Node prev = null, current = head, next = head.next;
+        Node prev = null, current = head, next;
         while(current != null){
+            next = current.next;
+
             current.next = prev;
 
             prev = current;
             current = next;
-            if(next != null) next = next.next;
         }
         return prev;
     }
