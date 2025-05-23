@@ -404,7 +404,7 @@ class LinkedListUtils {
         }
 
         public void setLeft(Node left){
-            this.left = null;
+            this.left = left;
         }
 
         public void setRight(Node right){
