@@ -7,15 +7,36 @@ import java.util.Queue;
 
 public class GFG_TreeProblems {
     public static void main(String[] args){
-        System.out.println();
+
+        Node node = new Node(1, new Node(2), new Node(3));
+        System.out.println(TreeUtils.findDiameter(node));
     }
 
     static class Node {
-        int data;
-        Node left, right;
-        Node(int item)    {
+        private int data;
+        private Node left, right;
+
+        public Node(int item)    {
             data = item;
             left = right = null;
+        }
+
+        public Node(int data, Node left, Node right){
+            this.data = data;
+            this.left = left;
+            this.right = right;
+        }
+
+        public int getData(){
+            return data;
+        }
+
+        public Node getLeft(){
+            return left;
+        }
+
+        public Node getRight(){
+            return right;
         }
     }
 
@@ -190,4 +211,116 @@ public class GFG_TreeProblems {
 
         return list;
     }
+
+
+
+
+    /**
+     *   2
+     * 1.  3
+     *       5
+     *
+     *    3
+     * 1.   4
+     *     2  5
+     *
+     * 1 3 2 4 5
+     * 1 2 3 4 5
+     *
+     * - left subtree
+     * - node
+     * - right subtree
+     *
+     * Time: O(n) time, O(n + h)
+     * where h is the height of the binary tree, which is space used by the
+     * recursive stack
+     * */
+    public static boolean isBinarySearchTree(Node root){
+        if(root == null) return false;
+
+        List<Integer> treeDataList = new ArrayList<>();
+        inOrderTraverse(root, treeDataList);
+
+        for(int i=1; i<treeDataList.size(); i++){
+            int current = treeDataList.get(i);
+            int prev = treeDataList.get(i-1);
+
+            if(prev > current) return false;
+        }
+        return true;
+    }
+
+    private static void inOrderTraverse(Node root, List<Integer> list){
+        if(root == null) return;
+
+        inOrderTraverse(root.left, list);
+        list.add(root.data);
+        inOrderTraverse(root.right, list);
+    }
+
+
+
+
+
+    /**
+     * Big Sample
+     *      5
+     *   8.     6
+     * 3.  7
+     1.     5
+     0      4
+           2
+
+     Small Sample
+          2
+     1       3
+     * */
+    static class TreeUtils {
+
+        public static int findDiameter(Node root){
+            if(root == null) return 0;
+
+
+            NodeInfo nodeInfo = getNodeInfo(root);
+            return nodeInfo.getMaxDiameter();
+        }
+
+        private static NodeInfo getNodeInfo(Node root){
+            if(root.getLeft() == null && root.getRight() == null) return new NodeInfo(0, 0);
+
+            NodeInfo left = new NodeInfo( 0, 0);
+            if(root.getLeft() != null) left = getNodeInfo(root.getLeft());
+
+            NodeInfo right = new NodeInfo( 0, 0);
+            if(root.getRight() != null) right = getNodeInfo(root.getRight());
+
+            int maxEdges = Math.max(left.getMaxEdges(), right.getMaxEdges()) + 1;
+            int diameter = left.getMaxEdges() +  right.getMaxEdges();
+            if(root.getLeft() != null) diameter++;
+            if(root.getRight() != null) diameter++;
+
+            int maxDiameter = Math.max(Math.max(left.getMaxDiameter(), right.getMaxDiameter()), diameter);
+
+            return new NodeInfo(maxEdges, maxDiameter);
+        }
+    }
+
+    static class NodeInfo {
+        private int maxEdges;
+        private int maxDiameter;
+
+        public NodeInfo(int maxEdges, int maxDiameter){
+            this.maxEdges = maxEdges;
+            this.maxDiameter = maxDiameter;
+        }
+
+        public int getMaxEdges(){
+            return maxEdges;
+        }
+
+        public int getMaxDiameter(){
+            return maxDiameter;
+        }
+    }
+
 }
