@@ -3,6 +3,7 @@ package com.company;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 public class GFG_LinkedListProblems {
 
@@ -53,11 +54,11 @@ public class GFG_LinkedListProblems {
 
     Node reverseList2(Node head){
         // code here - OPTIMAL
-        if(head == null) return head;
+        if(head == null) return null;
 
-        Node prev = null, current = head, next;
+        Node prev = null, current = head;
         while(current != null){
-            next = current.next;
+            Node next = current.next;
 
             current.next = prev;
 
@@ -307,6 +308,178 @@ public class GFG_LinkedListProblems {
         LinkedListUtils.flatten(node);
     }
 
+
+
+    /**
+     * 1 -> 9 ->  0 => 100 + 90 + 0
+     *
+     * 2 -> 5 => 20 + 5
+     *
+     * 2 1 5
+     *
+     * Two Options - (Take memory extra m+n)
+     * - Iterate, get values as string, convert to int then sum
+     * - Reverse, compute units, get int value then sum
+     *
+     *
+     * Alternatively, - (No extra memory)
+     * - Reverse, sum units and store in one of nodes, return node.
+     * */
+    public static Node addNodes(Node firstNode, Node secondNode){
+        // code here - LIMITED
+        if(firstNode == null && secondNode == null) return null;
+        if(firstNode == null) return secondNode;
+        if(secondNode == null) return firstNode;
+
+        int firstValue = getNodeValue(firstNode);
+        int secondValue = getNodeValue(secondNode);
+
+        int sum = firstValue + secondValue;
+
+        Node sumNode = buildNodeOfValue(sum);
+        return sumNode;
+    }
+
+    /**
+     * LIMITED: CHECK CASE BELOW
+     *
+     * For Input :
+     * 8 5 1 6 7 0 9 2 4 4 0 9
+     * 7 4 7 8 1 0 5 9 0 8 3 0
+     * Your Code's output is:
+     * 1 7 5 3 6 8 1 1 2 7
+     * It's Correct output is:
+     * 1 5 9 9 4 8 1 5 1 5 2 3 9
+     */
+
+    private static Node buildNodeOfValue(int value){
+        if(value < 10) return new Node(value);
+
+        /**
+         * 257 % 10 = 7 - unit
+         * 257 / 10 = 25
+         *
+         * 25 % 10 = 5 - unit
+         * 25 / 10 = 2
+         *
+         * 2 % 10 = 2 - unit
+         * 2 / 10 = 0
+         *
+         * */
+        Node prev = null;
+        while(value != 0){
+            int unit = value % 10;
+
+            prev = new Node(unit, prev);
+
+            value = value / 10;
+        }
+        return prev;
+    }
+
+    private static int getNodeValue(Node head){
+        if(head == null) return 0;
+        Node newHead = reverseNode(head);
+
+        Node current = newHead;
+
+        int sum = 0;
+        int unit = 1;
+        while(current != null){
+            sum += current.getData() * unit;
+
+            unit *= 10;
+            current = current.getNext();
+        }
+
+        reverseNode(newHead); // restore to original form
+        return sum;
+    }
+
+    private static Node reverseNode(Node node){
+        if(node == null) return null;
+        Node prev = null;
+        Node current = node;
+        Node next;
+
+        while(current != null){
+            next = current.getNext();
+
+            current.setNext(prev);
+
+            prev = current;
+            current = next;
+        }
+
+        return prev;
+    }
+
+
+
+    /**
+     *            s.  s.next
+     *                      f
+     *  1 -> 2 -> 3 -> 3 -> 2 -> 1
+     *                 1 -> 2 -> 3
+     *  H
+     * [3 2 1]
+     * - NB: While fast has next next
+     *
+     *           s     s.next
+     *                     f
+     * 1 -> 2 -> 3 -> 2 -> 1
+     * H
+     * [2 1]
+     *
+     * Edge cases:
+     * 0 item, return false; 1 item, return true; 2 item, algorithm works
+     *
+     * Solution 1: Stack O(n) time, O(n) space
+     *
+     * Solution 2: Reverse O(n) time, O(1) space
+     * */
+    public static boolean isPalindrome(Node head){
+        if(head == null) return false;
+        if(head.getNext() == null) return true;
+
+        // Get first node in second part of list
+        Node middle = findMiddleNode(head);
+
+        // Iterate and store elements of second part of list
+        Stack<Integer> stack = buildStackFromNode(middle.getNext());
+
+        // Compare data in second part of list to head
+        Node newCurrent = head;
+        while(!stack.isEmpty()){
+            if(newCurrent.getData() != stack.pop()) return false;
+
+            newCurrent = newCurrent.getNext();
+        }
+
+        return true;
+    }
+
+    private static Node findMiddleNode(Node head){
+        Node slow = head;
+        Node fast = head;
+        while(fast.getNext() != null && fast.getNext().getNext() != null){
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+        }
+        return slow;
+    }
+
+    private static Stack<Integer> buildStackFromNode(Node start){
+        Stack<Integer> stack = new Stack<>();
+        Node current = start.getNext();
+        while(current != null){
+            stack.push(current.getData());
+
+            current = current.getNext();
+        }
+        return stack;
+    }
+
 }
 
 
@@ -317,6 +490,11 @@ class Node {
 
     public Node(int value) {
         this.data = value;
+    }
+
+    public Node(int value, Node next){
+        this.data = value;
+        this.next = next;
     }
 
     public int getData(){
