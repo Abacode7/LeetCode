@@ -12,7 +12,7 @@ public class GFG_TreeProblems {
         System.out.println(TreeUtils.findDiameter(node));
     }
 
-    static class Node {
+    public static class Node {
         private int data;
         private Node left, right;
 
@@ -303,24 +303,215 @@ public class GFG_TreeProblems {
 
             return new NodeInfo(maxEdges, maxDiameter);
         }
+
+
+        static class NodeInfo {
+            private int maxEdges;
+            private int maxDiameter;
+
+            public NodeInfo(int maxEdges, int maxDiameter){
+                this.maxEdges = maxEdges;
+                this.maxDiameter = maxDiameter;
+            }
+
+            public int getMaxEdges(){
+                return maxEdges;
+            }
+
+            public int getMaxDiameter(){
+                return maxDiameter;
+            }
+        }
     }
 
-    static class NodeInfo {
-        private int maxEdges;
-        private int maxDiameter;
 
-        public NodeInfo(int maxEdges, int maxDiameter){
-            this.maxEdges = maxEdges;
-            this.maxDiameter = maxDiameter;
+
+
+
+    /**
+     *      12
+     *   8     18
+     *
+     *  5 11
+     *
+     * More left depth of a binary tree
+     * */
+    public static int height(Node node){
+        if(node == null) return 0;
+        if(node.getLeft() == null && node.getRight() == null) return 0;
+
+        int leftSubtreeHeight = node.getLeft() != null ? height(node.getLeft()) : 0;
+
+        int rightSubtreeHeight = node.getRight() != null ? height(node.getRight()) : 0;
+
+        return Math.max(leftSubtreeHeight, rightSubtreeHeight) + 1;
+    }
+
+
+
+
+    /**
+     * n1 = 5, n = 6
+     *          1
+     *    2.        3
+     * 4.   5.     6.  7
+     *      9 8
+     *     0
+     *
+     * 0 [1 2 5 9 0]
+     * 8 [1 2 5 8]
+     *
+     * 4 [1 2 4 ]
+     *
+     * 5[1 2 5]
+     *
+     * 6 [1 3 6]
+     *
+     * Solution: The idea is to use a list to track the parents of a tree
+     * On backtracking, remove fellow leaf nodes, since they're not parents
+     *
+     *
+     * */
+
+    Node lca(Node root, int n1, int n2) {
+        // Your code here
+        if(root == null) return null;
+
+        ArrayList<Node> n1List = new ArrayList<>();
+        boolean n1Found = searchTree(root, n1, n1List);
+
+        ArrayList<Node> n2List = new ArrayList<>();
+        boolean n2Found = searchTree(root, n2, n2List);
+
+        if(!n1Found || !n2Found) return null;
+
+        // compare list
+        Node ancestor = null;
+        int i = 0;
+        int j = 0;
+        while(i < n1List.size()  && j < n2List.size()){
+            if(n1List.get(i) != n2List.get(j)) break;
+
+            ancestor = n1List.get(i);
+
+            i++;
+            j++;
         }
 
-        public int getMaxEdges(){
-            return maxEdges;
+        return ancestor;
+    }
+
+    private boolean searchTree(Node root, int value, List<Node> parents){
+        if(root == null) return false;
+
+        parents.add(root);
+
+        if(root.data == value) return true;
+
+        if(root.left != null){
+            if(searchTree(root.left, value, parents)) return true;
+            if(!parents.isEmpty()) parents.remove(parents.size()-1);
         }
 
-        public int getMaxDiameter(){
-            return maxDiameter;
+        if(root.right != null){
+            if(searchTree(root.right, value, parents)) return true;
+            if(!parents.isEmpty()) parents.remove(parents.size()-1);
         }
+
+        return false;
+    }
+
+
+
+
+
+    /**
+     * The idea is to:
+     * - Collect the left boundary, which is not leaf
+     * - Collect the leafs nodes only, left to right
+     * - Collect the right boundary, which is not leaf
+     *
+     *        1
+     *    2.    3
+     *  4.  5.  6. 7
+     *     8 9.      0
+     *
+     * left [1 2] - To get in ascending order we use a pre order traversal
+     * leaf [4 8 9 6 0]
+     * right [7 3] - To get in reverse order we use a post order traversal
+     *
+     * */
+    ArrayList<Integer> boundaryTraversal(Node node) {
+        // code here
+        ArrayList<Integer> boundaryValues = new ArrayList<>();
+        if(node == null) return boundaryValues;
+
+        if(!isLeaf(node)) boundaryValues.add(node.data);
+
+        collectLeftBoundary(node.left, boundaryValues);
+
+        collectLeaves(node, boundaryValues);
+
+        collectRightBoundary(node.right, boundaryValues);
+
+        return boundaryValues;
+    }
+
+    // Function to collect left boundary nodes
+    // (top-down order)
+    private void collectLeftBoundary(Node node, List<Integer> list){
+        if(node == null || isLeaf(node)) return;
+
+        list.add(node.data);
+
+        if(node.left != null){
+            collectLeftBoundary(node.left, list);
+        }else if(node.right != null){
+            collectLeftBoundary(node.right, list);
+        }
+    }
+
+    private void collectRightBoundary(Node node, List<Integer> list){
+        if(node == null || isLeaf(node)) return;
+
+        if(node.right != null){
+            collectRightBoundary(node.right, list);
+        }else if(node.left != null){
+            collectRightBoundary(node.left, list);
+        }
+
+        list.add(node.data);
+    }
+
+    private void collectLeaves(Node node, List<Integer> list){
+        if(node == null) return;
+
+        if(isLeaf(node)){
+            list.add(node.data);
+            return;
+        }
+
+        collectLeaves(node.left, list);
+        collectLeaves(node.right, list);
+    }
+
+    /**
+     * For Input :
+     Case: 1 N 2 3 4 N N N N
+     My output: 1 3 4 2
+     Correct output: 1 3 4 2
+
+
+     Case: 1 2 3 N N 4 N 5 N N N
+     My output: 1 2 5 3
+     Correct output: 1 2 5 4 3
+
+     Case: 1 2 3 N 4 N 5 6
+     Correct: 1 2 4 6 5 3
+     My output: 1 2 6 5 3
+     * */
+    private boolean isLeaf(Node node){
+        return node.left == null && node.right == null;
     }
 
 }
