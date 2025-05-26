@@ -428,7 +428,6 @@ public class GFG_GraphProblems {
         return false;
     }
 
-
     private boolean dfsHelper(List<List<Integer>> graph, int vertex, int parent, boolean[] visited, boolean[] visiting){
         visited[vertex] = true;
         visiting[vertex] = true;
@@ -449,7 +448,6 @@ public class GFG_GraphProblems {
         return false;
     }
 
-
     private List<List<Integer>> buildUndirectedGraph(int vertices, int[][] edges){
         List<List<Integer>> graph = new ArrayList<>();
 
@@ -462,6 +460,121 @@ public class GFG_GraphProblems {
             graph.get(edge[1]).add(edge[0]);
         }
         return graph;
+    }
+
+
+
+    /**
+     * 0: 1(1) 2(6)
+     * 1: 0(1) 2(3)
+     * 2: 1(3) 0(6)
+     *
+     * Brute force is to explore all possible paths between 0 and the src
+     * 2 as destination.
+     *
+     * Using the Dijstras Algorithm (for Shortest path on weighted graph)
+     * Its a BFS with a minHeap which allows us to evaluate the node with smallest weights first
+     * (a form of Greedy algorithm)
+     * **/
+    static class GraphDijkstraUtils {
+
+        public static int[] shortestPath(int vertices, int[][] edges, int src){
+            List<List<Edge>> graph = buildGraph(vertices, edges);
+
+            int[] distanceToSource = new int[vertices];
+            Arrays.fill(distanceToSource, Integer.MAX_VALUE);
+            PriorityQueue<Vertex> queue = new PriorityQueue<>();
+
+            distanceToSource[src] = 0;
+            queue.offer(new Vertex(src, 0));
+
+
+            while(!queue.isEmpty()){
+
+                Vertex vertex = queue.poll();
+                List<Edge> adjacentEdges = graph.get(vertex.getData());
+
+                for(Edge edge: adjacentEdges){
+                    int source = vertex.getData();
+                    int destination = edge.getDestination();
+
+                    if(distanceToSource[destination] > distanceToSource[source] + edge.getWeight()){
+                        distanceToSource[destination] = distanceToSource[source] + edge.getWeight();
+                        queue.offer(new Vertex(destination, distanceToSource[destination]));
+                    }
+                }
+            }
+
+            return distanceToSource;
+        }
+
+
+        private static List<List<Edge>> buildGraph(int vertices, int[][] edges){
+            List<List<Edge>> graph = new ArrayList<>();
+
+            for(int i=0; i<vertices; i++){
+                graph.add(new ArrayList<>());
+            }
+
+            for(int[] edge: edges){
+                int u = edge[0];
+                int v = edge[1];
+                int weight = edge[2];
+
+                graph.get(u).add(new Edge(v, weight));
+                graph.get(v).add(new Edge(u, weight));
+            }
+            return graph;
+        }
+
+        static class Edge {
+            private int destination;
+            private int weight;
+
+
+            public Edge(int destination, int weight){
+                this.destination = destination;
+                this.weight = weight;
+            }
+
+            public int getDestination(){
+                return destination;
+            }
+
+            public int getWeight(){
+                return weight;
+            }
+        }
+
+
+
+        static class Vertex implements Comparable<Vertex>{
+            private int data;
+            private int weight;
+
+            public Vertex(int data, int weight){
+                this.data = data;
+                this.weight = weight;
+            }
+
+            public int getData(){
+                return data;
+            }
+
+            public int getWeight(){
+                return weight;
+            }
+
+            public void setWeight(int weight){
+                this.weight = weight;
+            }
+
+            public int compareTo(Vertex otherVertex){
+                if(weight < otherVertex.getWeight()) return -1;
+                else if(weight == otherVertex.getWeight()) return 0;
+                return 1;
+            }
+        }
     }
 
 
