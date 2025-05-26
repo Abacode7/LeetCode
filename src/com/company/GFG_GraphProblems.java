@@ -315,4 +315,154 @@ public class GFG_GraphProblems {
     }
 
 
+
+
+
+    /**
+     * Detect Cycle: Directed Graph
+     * 0: 1 2
+     * 1: 2
+     * 2: 0 3
+     *
+     * Intuition
+     * There's a cycle in an undirected graph if we revisit a node while it's still in visiting
+     * i.e while it's visiting is true
+     *
+     *
+     * Implementation Notes
+     * graph allows us track the adjacency list of the graph.
+     * List<List<Integer> supports constant time checks for the adjacents
+     *
+     * visited ensures we dont fully explore a node multiple times
+     * because each node dfsExporation, completely explores and finishes that node.
+     *
+     * visiting helps track the nodes in current exploration
+     * ensure to unmark it when done visiting the node.
+     *
+     * */
+    public boolean isCyclic(int V, int[][] edges) {
+        // code here
+        List<List<Integer>> graph = buildGraph(V, edges);
+        boolean[] visited = new boolean[V];
+        boolean[] visiting = new boolean[V];
+
+
+        for(int i=0; i<V; i++){
+            if(!visited[i]){
+                boolean isCyclic = dfsHelper(graph, i, visited, visiting);
+                if(isCyclic) return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private boolean dfsHelper(List<List<Integer>> graph, int node, boolean[] visited, boolean[] visiting){
+        visited[node] = true;
+        visiting[node] = true;
+
+        List<Integer> adjacents = graph.get(node);
+        for(int adjacent: adjacents){
+            if(visiting[adjacent]) return true;
+
+            if(!visited[adjacent]){
+                boolean isCyclic = dfsHelper(graph, adjacent, visited, visiting);
+                if(isCyclic) return true;
+            }
+        }
+
+        visiting[node] = false;
+        return false;
+    }
+
+    private List<List<Integer>> buildGraph(int V, int[][] edges){
+        List<List<Integer>> graph = new ArrayList<>();
+
+        for(int i=0; i<V; i++){
+            graph.add(new ArrayList<>());
+        }
+
+        for(int[] edge: edges){
+            graph.get(edge[0]).add(edge[1]);
+        }
+        return graph;
+    }
+
+
+
+
+
+    /**
+     * Detect Cycle: Undirected Graph
+     * 0: 1 2
+     * 1: 0 2
+     * 2: 0 1 3
+     * 3: 2
+     *
+     * 0    1   2   3
+     *[t    t   t       ] visited
+     *[t    t   t       ] visiting
+     *
+     * Intuition
+     * There's a cycle if you revisit a node while it's still in visiting.
+     *
+     * NB: For undirected graphs, we must ensure to exclude exploring a parent in
+     * the adjacency list of the child, because that could seem like a cycle.
+     * */
+    public boolean isCycle(int vertices, int[][] edges) {
+        // Code here
+        List<List<Integer>> graph = buildUndirectedGraph(vertices, edges);
+        boolean[] visited = new boolean[vertices];
+        boolean[] visiting = new boolean[vertices];
+
+        final int falseParent = -1;
+
+        for(int i=0; i<vertices; i++){
+            if(!visited[i]){
+                boolean isCycle = dfsHelper(graph, i, falseParent, visiting, visited);
+                if(isCycle) return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private boolean dfsHelper(List<List<Integer>> graph, int vertex, int parent, boolean[] visited, boolean[] visiting){
+        visited[vertex] = true;
+        visiting[vertex] = true;
+
+
+        List<Integer> adjacents = graph.get(vertex);
+        for(int adjacent: adjacents){
+            if(adjacent == parent) continue;
+
+            if(visiting[adjacent]) return true;
+
+            if(!visited[adjacent]){
+                if(dfsHelper(graph, adjacent, vertex, visited, visiting)) return true;
+            }
+        }
+
+        visiting[vertex] = false;
+        return false;
+    }
+
+
+    private List<List<Integer>> buildUndirectedGraph(int vertices, int[][] edges){
+        List<List<Integer>> graph = new ArrayList<>();
+
+        for(int i=0; i<vertices; i++){
+            graph.add(new ArrayList<>());
+        }
+
+        for(int[] edge: edges){
+            graph.get(edge[0]).add(edge[1]);
+            graph.get(edge[1]).add(edge[0]);
+        }
+        return graph;
+    }
+
+
 }
