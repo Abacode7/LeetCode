@@ -465,6 +465,7 @@ public class GFG_GraphProblems {
 
 
     /**
+     * Dijkstras Algorithm (for shortest path in weighted graph)
      * 0: 1(1) 2(6)
      * 1: 0(1) 2(3)
      * 2: 1(3) 0(6)
@@ -507,7 +508,6 @@ public class GFG_GraphProblems {
 
             return distanceToSource;
         }
-
 
         private static List<List<Edge>> buildGraph(int vertices, int[][] edges){
             List<List<Edge>> graph = new ArrayList<>();
