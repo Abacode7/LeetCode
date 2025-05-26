@@ -9,7 +9,7 @@ public class GFG_GraphProblems {
     }
 
     /**
-     * Solution: BFS, O(n) time, where nodes visited exactly once
+     * Solution: BFS, O(n + e) time, where nodes visited exactly once, where n is the number of vertices
      * O(n) space for the list & set, queue takes max element in level which is <= n/2 + 1
      */
     public ArrayList<Integer> bfs(ArrayList<ArrayList<Integer>> adj) {
@@ -41,7 +41,7 @@ public class GFG_GraphProblems {
 
 
     /**
-     * Solution: DFS, O(n) time, we traverse every element in graph
+     * Solution: DFS, O(n + e) time, we traverse every element in graph, where n is vertices and e is edges
      * O(n) for list and call stack
      */
     public ArrayList<Integer> dfs(ArrayList<ArrayList<Integer>> adj) {
@@ -247,6 +247,71 @@ public class GFG_GraphProblems {
             }
         }
         return -1;
+    }
+
+    static class Board {
+        private int boardSize;
+
+        public Board(int boardSize){
+            if(boardSize < 2) throw new IllegalArgumentException("Board should be greater than 2");
+            this.boardSize = boardSize;
+        }
+
+        private boolean isCellValid(Cell cell){
+            return cell.getRow() >= 1 && cell.getRow() <= boardSize && cell.getColumn() >= 1 && cell.getColumn() < boardSize;
+        }
+
+
+        static class Cell {
+            private int row;
+            private int column;
+
+            public Cell(int row, int column){
+                this.row = row;
+                this.column = column;
+            }
+
+            public int getRow(){
+                return row;
+            }
+
+            public int getColumn(){
+                return column;
+            }
+
+            /**
+             * 2North 1East, 2North 1West, 2South 1East, 2South 1West, 2East 1North,
+             *      * 2East 1South, 2West 1North, 2West 1South
+             *
+             * North: - row, South: + row, West: - column, East: + column
+             */
+            public List<Cell> getAdjacentCells(){
+                List<Cell> cells = new ArrayList<>();
+                int[][] directions = new int[][]{{-2, 1}, {-2, -1}, {2,1}, {2, -1}, {-1, 2}, {1,2}, {-1, -2}, {1, -2}};
+
+                for(int[] dir: directions){
+                    int newRow = row + dir[0];
+                    int newCol = column + dir[1];
+                    cells.add(new Cell(newRow, newCol));
+                }
+                return cells;
+            }
+
+            public boolean equals(Object otherCell){
+                if(this == otherCell) return true;
+                if(!(otherCell instanceof Cell)) return false;
+                Cell newOtherCell = (Cell) otherCell;
+                return this.row == newOtherCell.getRow() && this.column == newOtherCell.getColumn();
+            }
+
+            public int hashCode(){
+                return Objects.hash(row, column);
+            }
+
+            public String toString(){
+                return row + "-" + column;
+            }
+        }
     }
 
 
