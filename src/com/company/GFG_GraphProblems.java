@@ -9,7 +9,8 @@ public class GFG_GraphProblems {
 
 
         String[] words = new String[]{"baa", "abcd", "abca", "cab", "cad"};
-        System.out.println(AlienSolution.findOrder(words));
+        String[] words2 = new String[]{"abc", "abc"};
+        System.out.println(AlienSolution.findOrder(words2));
     }
 
     /**
@@ -606,7 +607,7 @@ class AlienSolution {
 
         Set<Edge> charRelations = findCharacterRelations(words);
 
-        Map<Character, List<Character>> graph = buildGraph(charRelations);
+        Map<Character, List<Character>> graph = buildGraph(charRelations, words);
         Set<Character> visited = new HashSet<>();
         Set<Character> visiting = new HashSet<>();
 
@@ -643,39 +644,37 @@ class AlienSolution {
         return true;
     }
 
-    private static Map<Character, List<Character>> buildGraph(Set<Edge> edges){
+    private static Map<Character, List<Character>> buildGraph(Set<Edge> edges, String[] words){
         Map<Character, List<Character>> graph = new HashMap<>();
-
         for(Edge edge: edges){
             char from = edge.getFrom();
             char to = edge.getTo();
 
-            List<Character> list = graph.getOrDefault(from, new ArrayList<>());
-            list.add(to);
-            graph.put(from, list);
+            graph.putIfAbsent(from, new ArrayList<>());
+            graph.putIfAbsent(to, new ArrayList<>());
 
-            if(!graph.containsKey(to)){
-                graph.put(to, new ArrayList<>());
-            }
+            graph.get(from).add(to);
         }
 
+        for(String word: words){
+            for(char wordChar: word.toCharArray()){
+                graph.putIfAbsent(wordChar, new ArrayList<>());
+            }
+        }
         return graph;
     }
 
     private static Set<Edge> findCharacterRelations(String[] words){
         Set<Edge> edges = new HashSet<>();
 
-        for(int i=0; i<words.length-1; i++){
-            for(int j=i+1; j<words.length; j++){
-                String firstWord = words[i];
-                String secondWord = words[j];
+        for(int i=1; i<words.length; i++){
+            String firstWord = words[i-1];
+            String secondWord = words[i];
 
-                Edge edge = findCharacterRelation(firstWord, secondWord);
+            Edge edge = findCharacterRelation(firstWord, secondWord);
 
-                if(edge != null) edges.add(edge);
-            }
+            if(edge != null) edges.add(edge);
         }
-
         return edges;
     }
 
