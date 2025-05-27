@@ -63,15 +63,8 @@ public class GFG_TriesProblems {
         System.out.println();
     }
 
-    public static class TrieNode {
-        TrieNode[] childNodes;
-        int wordCount;
 
-        public TrieNode(){
-            this.childNodes = new TrieNode[26];
-            wordCount = 0;
-        }
-    }
+
 
     /**
      * Intuition
@@ -90,6 +83,17 @@ public class GFG_TriesProblems {
      * Trie Building for list of words
      * Insertion: O(mn) where m is length of longest word, and n is the number of words. O(1) space
      */
+
+    public static class TrieNode {
+        TrieNode[] childNodes;
+        int wordCount;
+
+        public TrieNode(){
+            this.childNodes = new TrieNode[26];
+            wordCount = 0;
+        }
+    }
+
     public static void insert(TrieNode root, String data){
         TrieNode current = root;
 

@@ -176,9 +176,10 @@ class Trie {
         int childrenCount;
         int wordCount;
 
+        final static int ALPHABET_SIZE = 26;
 
         public TrieNode(){
-            this.children = new TrieNode[26];
+            this.children = new TrieNode[ALPHABET_SIZE];
             this.childrenCount = 0;
             this.wordCount = 0;
         }
