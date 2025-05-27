@@ -6,6 +6,10 @@ public class GFG_GraphProblems {
     public static void main(String[] args){
         int[][] edges = new int[][]{{3, 0}, {1, 0}, {2,0}};
         System.out.println(topologicalSort(4, edges));
+
+
+        String[] words = new String[]{"baa", "abcd", "abca", "cab", "cad"};
+        System.out.println(AlienSolution.findOrder(words));
     }
 
     /**
@@ -579,3 +583,157 @@ public class GFG_GraphProblems {
 
 
 }
+
+
+
+class AlienSolution {
+
+    /**
+     * "caa", "aaa", "aab"
+     * caa | aaa => c -> a
+     * caa | aab => c -> a
+     * aaa | aab => a -> b
+     *
+     * c -> a -> b
+     * Find the graph associations between characters
+     * Build graph from associations
+     * Find the topological sort of the graph
+     *
+     * */
+    public static String findOrder(String[] words) {
+        // code here
+        if(words == null || words.length == 0 || words.length == 1) return "";
+
+        Set<Edge> charRelations = findCharacterRelations(words);
+
+        Map<Character, List<Character>> graph = buildGraph(charRelations);
+        Set<Character> visited = new HashSet<>();
+        Set<Character> visiting = new HashSet<>();
+
+        StringBuilder result = new StringBuilder();
+
+        for(Map.Entry<Character, List<Character>> entry: graph.entrySet()){
+            if(!visited.contains(entry.getKey())){
+                boolean isSortable = topologicalSort(graph, entry.getKey(), result, visited, visiting);
+                if(!isSortable) return "";
+            }
+        }
+
+        // todo: Add every other
+        return result.reverse().toString();
+    }
+
+    private static boolean topologicalSort(Map<Character, List<Character>> graph, char wordChar, StringBuilder result, Set<Character> visited, Set<Character> visiting){
+        visited.add(wordChar);
+        visiting.add(wordChar);
+
+        List<Character> adjacents = graph.get(wordChar);
+
+        for(char adjacent: adjacents){
+            if(visiting.contains(adjacent)) return false;
+
+            if(!visited.contains(adjacent)){
+                boolean isSortable = topologicalSort(graph, adjacent, result, visited, visiting);
+                if(!isSortable) return false;
+            }
+        }
+
+        visiting.remove(wordChar);
+        result.append(wordChar);
+        return true;
+    }
+
+    private static Map<Character, List<Character>> buildGraph(Set<Edge> edges){
+        Map<Character, List<Character>> graph = new HashMap<>();
+
+        for(Edge edge: edges){
+            char from = edge.getFrom();
+            char to = edge.getTo();
+
+            List<Character> list = graph.getOrDefault(from, new ArrayList<>());
+            list.add(to);
+            graph.put(from, list);
+
+            if(!graph.containsKey(to)){
+                graph.put(to, new ArrayList<>());
+            }
+        }
+
+        return graph;
+    }
+
+    private static Set<Edge> findCharacterRelations(String[] words){
+        Set<Edge> edges = new HashSet<>();
+
+        for(int i=0; i<words.length-1; i++){
+            for(int j=i+1; j<words.length; j++){
+                String firstWord = words[i];
+                String secondWord = words[j];
+
+                Edge edge = findCharacterRelation(firstWord, secondWord);
+
+                if(edge != null) edges.add(edge);
+            }
+        }
+
+        return edges;
+    }
+
+    private static Edge findCharacterRelation(String firstWord, String secondWord){
+
+        int i = 0;
+        int j = 0;
+
+        while(i < firstWord.length() && j < secondWord.length()){
+            char firstChar = firstWord.charAt(i);
+            char secondChar = secondWord.charAt(j);
+
+            if(firstChar != secondChar) {
+                return new Edge(firstChar, secondChar);
+            }
+
+            i++;
+            j++;
+        }
+        return null;
+    }
+
+    static class Edge {
+        private char from;
+        private char to;
+
+        public Edge(char from, char to){
+            this.from = from;
+            this.to = to;
+        }
+
+        public char getFrom(){
+            return from;
+        }
+
+        public char getTo(){
+            return to;
+        }
+
+        public boolean equals(Object object){
+            if(this == object) return true;
+            if(!(object instanceof Edge)) return false;
+            Edge otherEdge = (Edge) object;
+            return this.from == otherEdge.getFrom() && this.to == otherEdge.getTo();
+        }
+
+        public int hashCode(){
+            return Objects.hash(from, to);
+        }
+    }
+
+    /**
+     * For Input :
+     * dddc a ad ab b be cd cded
+     * Your Code's output is:
+     * false
+     * It's Correct output is:
+     * true
+     */
+}
+
