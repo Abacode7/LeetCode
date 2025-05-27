@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("ALL")
 public class GFG_TriesProblems {
+    /** Refer to Trie Design Solution for ideal Trie Implementation **/
     public static void main(String[] args){
         System.out.println("Yay Tries!");
         TrieNode trieNode = new TrieNode();
@@ -41,6 +42,16 @@ public class GFG_TriesProblems {
             System.out.printf("This word: %s is present in trie: %s\n", word, search(trieNode, word));
         }
         System.out.println();
+
+        /** Edge Case Test */
+//        System.out.println("\nInsert an and ant in Trie; Delete in Trie\n");
+//        insert(trieNode, "an");
+//        insert(trieNode, "ant");
+//
+//        System.out.println("Search in trie: an: " + search(trieNode, "an"));
+//        System.out.println("Delete in trie: ant: " + delete(trieNode, "ant"));
+//        System.out.println("Search in trie: ant: " + search(trieNode, "ant"));
+//        System.out.println("Search in trie: an: " + search(trieNode, "an"));
 
         // Longest Common Prefix
         System.out.println(longestCommonPrefix2(new String[]{ "ambivert", "ambission", "amber", "ambivalent", "ambassy"}));
@@ -130,8 +141,8 @@ public class GFG_TriesProblems {
      * */
     public static boolean delete(TrieNode root, String data){
         TrieNode current = root;
-        TrieNode lastCurrentNode = null;
-        char lastCurrentChar = 'a';
+        TrieNode lastMultiBranchNode = null;
+        char lastMultiBranchChar = 'a';
 
         for(char c: data.toCharArray()){
             if(current.childNodes[c - 'a'] == null) return false;
@@ -142,8 +153,8 @@ public class GFG_TriesProblems {
                 }
 
                 if(count > 1){
-                    lastCurrentNode = current;
-                    lastCurrentChar = c;
+                    lastMultiBranchNode = current;
+                    lastMultiBranchChar = c;
                 }
             }
 
@@ -155,14 +166,14 @@ public class GFG_TriesProblems {
         for(TrieNode node: current.childNodes){
             if(node != null) count++;
         }
-        if(count > 1) {
+        if(count > 0) {
             current.wordCount--;
             return true;
         }
 
-        // Check if current node is a suffix, lastCurrentNode should not be null
-        if(lastCurrentNode != null){
-            lastCurrentNode.childNodes[lastCurrentChar - 'a'] = null;
+        // Check if current node is a suffix, lastMultiBranchNode should not be null
+        if(lastMultiBranchNode != null){
+            lastMultiBranchNode.childNodes[lastMultiBranchChar - 'a'] = null;
         }else{
             root.childNodes[data.charAt(0) - 'a'] = null;
         }
@@ -171,8 +182,8 @@ public class GFG_TriesProblems {
 
     public static boolean deleteRefactored(TrieNode root, String data){
         TrieNode current = root;
-        TrieNode lastCurrentNode = root;
-        char lastCurrentChar = data.charAt(0);
+        TrieNode lastMultiBranchNode = root;
+        char lastMultiBranchChar = data.charAt(0);
 
         for(char c: data.toCharArray()){
             if(current.childNodes[c - 'a'] == null) return false;
@@ -181,8 +192,8 @@ public class GFG_TriesProblems {
                 for(TrieNode node: current.childNodes){
                     if(node != null) count++;
                     if(count > 1){
-                        lastCurrentNode = current;
-                        lastCurrentChar = c;
+                        lastMultiBranchNode = current;
+                        lastMultiBranchChar = c;
                         break;
                     }
                 }
@@ -201,7 +212,7 @@ public class GFG_TriesProblems {
         }
 
         // Set the last multi-children node (with last character) to null
-        lastCurrentNode.childNodes[lastCurrentChar - 'a'] = null;
+        lastMultiBranchNode.childNodes[lastMultiBranchChar - 'a'] = null;
         return true;
     }
 
