@@ -1,6 +1,6 @@
 package com.company;
 
-public class TrieDesignSolution {
+public class GFG_TrieDesignLearnings {
     public static void main(String[] args){
         Trie trie = new Trie();
 
