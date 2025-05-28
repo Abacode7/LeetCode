@@ -1147,6 +1147,9 @@ public class GFG_DynamicProgrammingLearnings {
      *      Edge: In other cases, the problem might ask you to do something with the path edges downwards.
      *      In this you might save the edges or sum them or whatever, but the focus is the edges.
      *
+     *      E.g: Given a problem where you're to sum the edges, FIRST keep in mind the focus is the edge path downwards.
+     *      Then you can have a base case of say 0, which is an identity value that allows you sum the edges upwards.
+     *
      */
 
 

@@ -36,6 +36,12 @@ public class GFG_DynamicProgrammingProblems {
      *
      * dp(W, n) = dp(W, n-1) OR dp(W-arr[n-1], n-1)
      *
+     * Converting Forward (to be used in tabular format)
+     * Making dp(W, n-1) be dp(W, n), then it contributes to:  dp(W, n+1)
+     * Making dp(W-arr[n-1], n-1) be dp(W,n), then it contributes to:  dp(W+arr[n-1],n+1)
+     * dp(W, n) => dp(W, n+1) + dp(W+arr[n-1,n+1)
+     *
+     *
      * Tag: Selection, Finite
      */
 
@@ -44,10 +50,8 @@ public class GFG_DynamicProgrammingProblems {
         int wtLength = wt.length;
         int[][] memo = new int[W+1][wt.length+1];
 
-        for(int i=0; i < W+1; i++){
-            for(int j=0; j < wtLength+1; j++){
-                memo[i][j] = -1;
-            }
+        for(int[] row: memo){
+            Arrays.fill(row, -1);
         }
         return knapsack(W, val, wt, wtLength, memo);
     }
@@ -235,66 +239,6 @@ public class GFG_DynamicProgrammingProblems {
 
 
     /**
-     * coins [25, 10, 5], sum = 30
-     *
-     *                  30{25,10,5}
-     *          30{25,10}.        25{25,10,5}
-     *   30{25}.   20{25}.      25{25,10}   15{25,10,5}
-     *
-     *  *                  30{10,5,25}
-     *          30{10,5}.          5{10,5,25}
-     *                            5{10,5}.
-     *                      5{10}.    0{10,5}
-     *
-     *      * 0.....30
-     *      * [0...n-1] where n is the lenght of coins
-     *      *
-     *      * dp(sum,n) = dp(sum,n-1) OR dp(sum-arr[n-1], n)
-     *
-     *      Tag: Selection, Infinite
-     * */
-    public int minCoins(int coins[], int sum) {
-        // code here
-        int[][] memo = new int[sum+1][coins.length+1];
-        for(int[] row: memo){
-            Arrays.fill(row, -2);
-        }
-        return minCoins(coins, coins.length, sum, memo);
-    }
-
-    private int minCoins(int coins[], int coinsLength, int sum, int[][] memo) {
-        // code here
-        if(sum == 0) return 0;
-        if(coinsLength == 0) return -1;
-
-        if(memo[sum][coinsLength] != -2) return memo[sum][coinsLength];
-
-
-        int minCoinsWithout = minCoins(coins, coinsLength-1, sum, memo);
-        int minCoinsWith = -1;
-        if(coins[coinsLength-1] <= sum){
-            minCoinsWith = minCoins(coins, coinsLength, sum-coins[coinsLength-1], memo);
-            if(minCoinsWith != -1) minCoinsWith += 1;
-        }
-
-        int minCoin = -1;
-        if(minCoinsWith != -1 && minCoinsWithout != -1){
-            minCoin = Math.min(minCoinsWith, minCoinsWithout);
-        }else if(minCoinsWithout == -1){
-            minCoin = minCoinsWith;
-        }else{
-            minCoin = minCoinsWithout;
-        }
-
-        memo[sum][coinsLength] = minCoin;
-        return minCoin;
-    }
-
-
-
-
-
-    /**
      *               [100, 180, 260, 310, 40, 535, 695]
      *
      *                              root[100, 180, 260, 310, 40, 535, 695]
@@ -429,6 +373,66 @@ public class GFG_DynamicProgrammingProblems {
         memo[s1Length][s2Length] = lcsValue;
         return lcsValue;
     }
+
+
+
+
+    /**
+     * coins [25, 10, 5], sum = 30
+     *
+     *                  30{25,10,5}
+     *          30{25,10}.        25{25,10,5}
+     *   30{25}.   20{25}.      25{25,10}   15{25,10,5}
+     *
+     *  *                  30{10,5,25}
+     *          30{10,5}.          5{10,5,25}
+     *                            5{10,5}.
+     *                      5{10}.    0{10,5}
+     *
+     *      * 0.....30
+     *      * [0...n-1] where n is the lenght of coins
+     *      *
+     *      * dp(sum,n) = dp(sum,n-1) OR dp(sum-arr[n-1], n)
+     *
+     *      Tag: Selection, Infinite
+     * */
+    public int minCoins(int coins[], int sum) {
+        // code here
+        int[][] memo = new int[sum+1][coins.length+1];
+        for(int[] row: memo){
+            Arrays.fill(row, -2);
+        }
+        return minCoins(coins, coins.length, sum, memo);
+    }
+
+    private int minCoins(int coins[], int coinsLength, int sum, int[][] memo) {
+        // code here
+        if(sum == 0) return 0;
+        if(coinsLength == 0) return -1;
+
+        if(memo[sum][coinsLength] != -2) return memo[sum][coinsLength];
+
+
+        int minCoinsWithout = minCoins(coins, coinsLength-1, sum, memo);
+        int minCoinsWith = -1;
+        if(coins[coinsLength-1] <= sum){
+            minCoinsWith = minCoins(coins, coinsLength, sum-coins[coinsLength-1], memo);
+            if(minCoinsWith != -1) minCoinsWith += 1;
+        }
+
+        int minCoin = -1;
+        if(minCoinsWith != -1 && minCoinsWithout != -1){
+            minCoin = Math.min(minCoinsWith, minCoinsWithout);
+        }else if(minCoinsWithout == -1){
+            minCoin = minCoinsWith;
+        }else{
+            minCoin = minCoinsWithout;
+        }
+
+        memo[sum][coinsLength] = minCoin;
+        return minCoin;
+    }
+
 
 
     /**
