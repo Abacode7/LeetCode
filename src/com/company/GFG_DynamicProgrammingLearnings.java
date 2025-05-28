@@ -3,7 +3,7 @@ package com.company;
 import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
-public class YT_DynamicProgrammingLearnings {
+public class GFG_DynamicProgrammingLearnings {
     public static void main(String[] args){
         // Reference
         // https://www.youtube.com/watch?v=oBt53YbR9Kk

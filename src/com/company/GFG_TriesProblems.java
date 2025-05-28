@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("ALL")
 public class GFG_TriesProblems {
-    /** Refer to Trie Design Solution for ideal Trie Implementation **/
+    /** Refer to Trie Design Learnings for ideal Trie Implementation **/
     public static void main(String[] args){
         System.out.println("Yay Tries!");
         TrieNode trieNode = new TrieNode();

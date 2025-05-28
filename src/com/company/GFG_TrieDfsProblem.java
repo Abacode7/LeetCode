@@ -3,7 +3,7 @@ package com.company;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GFG_TrieTest {
+public class GFG_TrieDfsProblem {
 
     public static void main(String[] args){
         int[][] a = {{1, 1, 0, 1},{1, 0, 0, 1},{1, 1, 0, 1}};
